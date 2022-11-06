@@ -12,7 +12,7 @@ class Database(object):
         return cls._instance
 
 
-    def getdf(self, tableName:str) -> DataFrame:
+    def getdf(self, tableName:str, sqlquery:str="*") -> DataFrame:
         return psql.read_sql('SELECT * FROM {tableName}'.format(tableName=tableName), self.connection)
 
 
