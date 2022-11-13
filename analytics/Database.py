@@ -12,8 +12,14 @@ class Database(object):
         return cls._instance
 
 
-    def getdf(self, tableName:str, sqlquery:str="*") -> DataFrame:
-        return psql.read_sql('SELECT * FROM {tableName}'.format(tableName=tableName), self.connection)
+    def getdf(self, tableName:str, sqlquery:str="") -> DataFrame:
+        if sqlquery == "":
+            sqlquery = 'SELECT * FROM {tableName}'.format(tableName=tableName)
+        return psql.read_sql(sqlquery, self.connection)
+    
+    
+    def getdf_tablenames(self) -> DataFrame:
+        return psql.read_sql("SELECT * FROM INFORMATION_SCHEMA.TABLES GO ", self.connection)
 
 
     def execut_sql(self, query:str) -> list:
