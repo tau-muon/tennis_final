@@ -21,6 +21,7 @@ df_radar = df[["name","matches_win_percentage", "grand_slam_win_percentage","tou
 # Crate app
 
 app = dash.Dash(__name__, prevent_initial_callbacks=False)
+server = app.server
 
 #define graph function
 
