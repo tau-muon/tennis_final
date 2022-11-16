@@ -5,19 +5,24 @@ import os
 import dash
 import pandas as pd
 import plotly.graph_objs as go
+import plotly.express as px
 from dash import html, dcc
 from dash.dependencies import Input, Output
 
 # Read the data
 
+dirname = os.path.dirname(__file__)
+path = os.path.join(dirname, "data/")
 
-df = pd.read_csv("data/tennis_players_data.csv", index_col="player_id")
+df = pd.read_csv(path + "tennis_players_data.csv", index_col="player_id")
 df = df[df.active == "t"]
 df_radar = df[["name", "matches_win_percentage", "grand_slam_win_percentage", "tour_finals_win_percentage",
                "olympics_matches_win_percentage", "davis_cup_matches_win_percentage", "hard_matches_win_percentage",
                "clay_matches_win_percentage",
                "grass_matches_win_percentage", "carpet_matches_win_percentage", "outdoor_matches_win_percentage",
                "indoor_matches_win_percentage"]]
+
+country_code = dict(df["country_id"])
 
 
 # Function for figures
@@ -61,6 +66,23 @@ def radar_chart(data, player_id_1, player_id_2):
     return fig
 
 
+def show_country(player_id_1, player_id_2):
+    data = df
+    player1_country_id = list(data[data.index.isin([player_id_1, player_id_2])]['country_id'])[0]
+    player2_country_id = list(data[data.index.isin([player_id_1, player_id_2])]['country_id'])[1]
+    gapminder = px.data.gapminder()
+    data_file = gapminder[
+        (gapminder['iso_alpha'] == player1_country_id) | (gapminder['iso_alpha'] == player2_country_id)]
+    fig = px.choropleth(data_file, locations="iso_alpha",
+                        color="country",  # lifeExp is a column of gapminder
+                        hover_name="country",  # column to add to hover information
+                        color_continuous_scale=px.colors.sequential.Plasma)
+    fig.update_layout(title_text='', title_x=0.5, title_y=0.95, title_font_family="Old Standard TT",
+                      title_font_size=40, title_font_color='green', paper_bgcolor='white', plot_bgcolor='red')
+    fig.update_layout(height=450, width=600)
+    return fig
+
+
 # ------------------------------------------------------ APP ------------------------------------------------------
 
 app = dash.Dash(__name__, prevent_initial_callbacks=False)
@@ -70,6 +92,7 @@ server = app.server
 
 app.layout = html.Div(
     [
+        # left pane
         html.Div(
             [
                 html.H1(children="Tennis Prediction"),
@@ -90,6 +113,8 @@ app.layout = html.Div(
             ],
             className="side_bar",
         ),
+
+        # player Selection Pane at Top
         html.Div(
             [
                 html.Div(
@@ -152,6 +177,9 @@ app.layout = html.Div(
                             ),
 
                         ], className="box"),
+
+                        # Two charts radar and map
+
                         html.Div(
                             [
                                 html.Div(
@@ -170,78 +198,29 @@ app.layout = html.Div(
                                         ),
 
                                     ],
-                                    style={"width": "40%"},
+                                    style={"width": "40%", "display": "inline-block"},
                                 ),
                                 html.Div(
                                     [
                                         html.Div(
                                             [
-
+                                                html.Label(id="title_bar2"),
+                                                dcc.Graph(id="map_chart"),
                                                 html.Div(
-                                                    [
-                                                        html.Div(
-                                                            [
-                                                                html.Div(
-                                                                    [
-                                                                        html.Br(),
-                                                                        html.Label(
-                                                                            id="title_map",
-                                                                            style={
-                                                                                "font-size": "medium"
-                                                                            },
-                                                                        ),
-                                                                        html.Br(),
-
-                                                                    ],
-                                                                    style={
-                                                                        "width": "70%"
-                                                                    },
-                                                                ),
-                                                                html.Div(
-                                                                    [],
-                                                                    style={
-                                                                        "width": "5%"
-                                                                    },
-                                                                ),
-                                                                html.Div(
-                                                                    [
-
-                                                                        html.Br(),
-                                                                        html.Br(),
-                                                                    ],
-                                                                    style={
-                                                                        "width": "25%"
-                                                                    },
-                                                                ),
-                                                            ],
-                                                            className="row",
-                                                        ),
-                                                        dcc.Graph(
-                                                            id="map",
-                                                            style={
-                                                                "position": "relative",
-                                                                "top": "-50px",
-                                                            },
-                                                        ),
-                                                        html.Div(
-
-                                                            style={
-                                                                "margin-left": "15%",
-                                                                "position": "relative",
-                                                                "top": "-38px",
-                                                            },
-                                                        ),
-                                                    ],
-                                                    className="box",
-                                                    style={"padding-bottom": "0px"},
+                                                    [html.P(id="comment2")],
+                                                    className="box_comment",
                                                 ),
-                                            ]
+
+                                            ],
+                                            className="box",
+                                            style={"padding-bottom": "15px"},
                                         ),
+
                                     ],
-                                    style={"width": "60%"},
+                                    style={"width": "40%", "display": "inline-block"},
                                 ),
                             ],
-                            className="row",
+                            className="box",
                         ),
                         html.Div(
                             [
@@ -334,10 +313,18 @@ app.layout = html.Div(
      Input(component_id='dropdown_player_2', component_property='value')])
 def update_plot(player1, player2):
     fig = radar_chart(df_radar, player1, player2)
-    fig.update_layout(
-        template='gridon'
-    )
+    fig.update_layout(template='gridon')
+    return fig
 
+
+
+@app.callback(
+    Output(component_id='map_chart', component_property='figure'),
+    [Input(component_id='dropdown_player_1',component_property= 'value'),
+    Input(component_id='dropdown_player_2',component_property= 'value')])
+def update_plot(player1, player2):
+    fig = show_country(player1, player2)
+    fig.update_layout(template='gridon')
     return fig
 
 
