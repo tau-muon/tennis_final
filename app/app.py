@@ -1,28 +1,30 @@
 # Import Libraries
 
-import os
-
 import dash
 import pandas as pd
+import numpy as np
 import plotly.graph_objs as go
 import plotly.express as px
+import requests
 from dash import html, dcc
 from dash.dependencies import Input, Output
+from dash.exceptions import PreventUpdate
 
 # Read the data
 
-dirname = os.path.dirname(__file__)
-path = os.path.join(dirname, "data/")
-
-df = pd.read_csv(path + "tennis_players_data.csv", index_col="player_id")
-df = df[df.active == "t"]
+df = pd.read_csv("data/tennis_players_data.csv", index_col="player_id")
+df = df[df.api_id != "NOID"]
 df_radar = df[["name", "matches_win_percentage", "grand_slam_win_percentage", "tour_finals_win_percentage",
                "olympics_matches_win_percentage", "davis_cup_matches_win_percentage", "hard_matches_win_percentage",
-               "clay_matches_win_percentage",
-               "grass_matches_win_percentage", "carpet_matches_win_percentage", "outdoor_matches_win_percentage",
-               "indoor_matches_win_percentage"]]
+               "clay_matches_win_percentage", "grass_matches_win_percentage", "carpet_matches_win_percentage",
+               "outdoor_matches_win_percentage", "indoor_matches_win_percentage"]]
 
-country_code = dict(df["country_id"])
+BASE_URL = 'https://api.api-tennis.com/tennis/?'
+API_KEY = 'ea89424e9ed0b69d1386acb1ee3c2ae8869cb1b9a5af231f377772842b8c2b26'
+method = 'method=get_players'
+
+
+# country_code = dict(df["country_id"])
 
 
 # Function for figures
@@ -31,7 +33,7 @@ def radar_chart(data, player_id_1, player_id_2):
     df_graph = data[data.index.isin([player_id_1, player_id_2])]
 
     categories = ['Matches Won', 'Grand Slam Matches Won', 'Tour Finals Matches Won',
-                  'Olympics Matches Won', 'Davius Cup Matches Won', 'Hard Matches Won',
+                  'Olympics Matches Won', 'Davis Cup Matches Won', 'Hard Matches Won',
                   'Clay Matches Won', 'Grass Matches Won', 'Carper Matches Won',
                   'Outdoor Matches Won', 'Indoor Matches Won']
 
@@ -79,7 +81,144 @@ def show_country(player_id_1, player_id_2):
                         color_continuous_scale=px.colors.sequential.Plasma)
     fig.update_layout(title_text='', title_x=0.5, title_y=0.95, title_font_family="Old Standard TT",
                       title_font_size=40, title_font_color='green', paper_bgcolor='white', plot_bgcolor='red')
-    fig.update_layout(height=450, width=600)
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=20, b=20),
+        paper_bgcolor="LightSteelBlue",
+    )
+    return fig
+
+
+# ----------18th Nov 2022
+
+def country_id(player_id):
+    data = df
+    country = list(data[data.index.isin([player_id])]['country_id_2'])[0]
+    return country
+
+
+def get_country_flag(player_id):
+    country = country_id(player_id)
+    flag = f"https://countryflagsapi.com/svg/{country}"
+    return flag
+
+
+def api_id(player_id):
+    data = df
+    id_api = list(data[data.index.isin([player_id])]['api_id'])[0]
+    return id_api
+
+
+def rank_season(player1_id, player2_id):
+    api_p1 = api_id(player1_id)
+    api_p2 = api_id(player2_id)
+
+    complete_url_1 = f"{BASE_URL}{method}&player_key={api_p1}&APIkey={API_KEY}"
+    complete_url_2 = f"{BASE_URL}{method}&player_key={api_p2}&APIkey={API_KEY}"
+    response_1 = requests.get(complete_url_1)
+    response_2 = requests.get(complete_url_2)
+    player_1_data = response_1.json()
+    player_2_data = response_2.json()
+
+    player_1_df = pd.DataFrame(player_1_data['result'][0]['stats'])
+    player_1_df = player_1_df[player_1_df['type'] == 'singles']
+    player_1_df = player_1_df.replace('', 0)
+    player_1_df[
+        ['rank', 'titles', 'matches_won', 'matches_lost', 'hard_won', 'hard_lost', 'clay_won', 'clay_lost', 'grass_won',
+         'grass_lost']] = player_1_df[
+        ['rank', 'titles', 'matches_won', 'matches_lost', 'hard_won', 'hard_lost', 'clay_won', 'clay_lost', 'grass_won',
+         'grass_lost']].astype(int)
+
+    player_2_df = pd.DataFrame(player_2_data['result'][0]['stats'])
+    player_2_df = player_2_df[player_2_df['type'] == 'singles']
+    player_2_df = player_2_df.replace('', 0)
+    player_2_df[
+        ['rank', 'titles', 'matches_won', 'matches_lost', 'hard_won', 'hard_lost', 'clay_won', 'clay_lost', 'grass_won',
+         'grass_lost']] = player_2_df[
+        ['rank', 'titles', 'matches_won', 'matches_lost', 'hard_won', 'hard_lost', 'clay_won', 'clay_lost', 'grass_won',
+         'grass_lost']].astype(int)
+
+    df1 = player_1_df[['season', 'rank', 'titles']].iloc[::-1]
+    df2 = player_2_df[['season', 'rank', 'titles']].iloc[::-1]
+    df3 = df1.merge(df2, on='season', how='outer')
+    df3.sort_values(by=["season"], inplace=True)
+    df3.rename(columns={'rank_x': 'player_1_rank', 'titles_x': 'player_1_title', 'rank_y': 'player_2_rank',
+                        'titles_y': 'player_2_title'}, inplace=True, errors='raise')
+    df3.replace(to_replace=0, value=np.nan, inplace=True)
+
+    fig = px.line(df3, x='season',
+                  y=['player_1_rank', 'player_2_rank'],
+                  # labels = {}
+                  markers=True)
+
+    # Title
+    annotations = [dict(xref='paper', yref='paper', x=0.0, y=1.05,
+                        xanchor='left', yanchor='bottom',
+                        text=f"Player 1: {player_1_data['result'][0]['player_name']} vs Player 2:"
+                             f" {player_2_data['result'][0]['player_name']}  Rank over Years",
+                        font=dict(family='Arial',
+                                  size=30,
+                                  color='rgb(37,37,37)'),
+                        showarrow=False), dict(xref='paper', yref='paper', x=0.5, y=-0.25,
+                                               xanchor='center', yanchor='top',
+                                               text='Source: https://api-tennis.com/',
+                                               font=dict(family='Arial',
+                                                         size=12,
+                                                         color='rgb(150,150,150)'),
+                                               showarrow=False)]
+    # Source
+
+    fig.update_layout(annotations=annotations)
+
+    return fig
+
+
+def title_season(player1_id, player2_id):
+    complete_url_1 = f"{BASE_URL}{method}&player_key={api_id(player1_id)}&APIkey={API_KEY}"
+    complete_url_2 = f"{BASE_URL}{method}&player_key={api_id(player2_id)}&APIkey={API_KEY}"
+    response_1 = requests.get(complete_url_1)
+    response_2 = requests.get(complete_url_2)
+    player_1_data = response_1.json()
+    player_2_data = response_2.json()
+
+    player_1_df = pd.DataFrame(player_1_data['result'][0]['stats'])
+    player_1_df = player_1_df[player_1_df['type'] == 'singles']
+    player_1_df = player_1_df.replace('', 0)
+    player_1_df[['rank', 'titles']] = player_1_df[['rank', 'titles']].astype(int)
+
+    player_2_df = pd.DataFrame(player_2_data['result'][0]['stats'])
+    player_2_df = player_2_df[player_2_df['type'] == 'singles']
+    player_2_df = player_2_df.replace('', 0)
+    player_2_df[['rank', 'titles']] = player_2_df[['rank', 'titles']].astype(int)
+
+    df1 = player_1_df[['season', 'rank', 'titles']].iloc[::-1]
+    df2 = player_2_df[['season', 'rank', 'titles']].iloc[::-1]
+    df3 = df1.merge(df2, on='season', how='outer')
+    df3.rename(columns={'titles_x': 'Player1_titles',
+                        'titles_y': 'Player2_titles'},
+               inplace=True, errors='raise')
+    df3.replace(np.nan, 0, inplace=True)
+    df3.sort_values(by=["season"], inplace=True)
+
+    fig = px.bar(df3, x='season',
+                 y=['Player1_titles', 'Player2_titles'], barmode="group")
+    # Title
+    annotations = [dict(xref='paper', yref='paper', x=0.0, y=1.05,
+                        xanchor='left', yanchor='bottom',
+                        text=f"Player 1: {player_1_data['result'][0]['player_name']} vs Player 2: "
+                             f"{player_2_data['result'][0]['player_name']}  Seasonal Titles",
+                        font=dict(family='Arial',
+                                  size=30,
+                                  color='rgb(37,37,37)'),
+                        showarrow=False), dict(xref='paper', yref='paper', x=0.5, y=-0.25,
+                                               xanchor='center', yanchor='top',
+                                               text='Source: https://api-tennis.com/',
+                                               font=dict(family='Arial',
+                                                         size=12,
+                                                         color='rgb(150,150,150)'),
+                                               showarrow=False)]
+    fig.update_layout(annotations=annotations)
+
+    # fig.update_layout(template="plotly_white")
     return fig
 
 
@@ -97,7 +236,8 @@ app.layout = html.Div(
             [
                 html.H1(children="Tennis Prediction"),
                 html.Label(
-                    "This app compares two players and tries to predict the winner if the selected players were to "
+                    "This app compares various statistics for two selected players and tries to predict the winner if "
+                    "the selected players were to "
                     "face off, the dropdown option gives players who were active till the end of 2021 season. ",
                     style={"color": "rgb(33 36 35)"},
                 ),
@@ -124,11 +264,12 @@ app.layout = html.Div(
 
                                 html.Label("Select Player 1:"),
                                 html.Br(),
+
                                 html.Br(),
                                 dcc.Dropdown(
                                     id='dropdown_player_1',
                                     options=[{'label': i, 'value': j} for i, j in dict(zip(df.name, df.index)).items()],
-                                    value=3819),
+                                    value=26006),
                             ],
 
                                 style={
@@ -136,17 +277,83 @@ app.layout = html.Div(
                                     "display": "inline-block",
                                     "padding-top": "15px",
                                     "padding-bottom": "15px",
-                                    "width": "30%",
+                                    "width": "12%",
                                 }, ),
+
                             html.Img(
                                 src=app.get_asset_url("player1.png"),
                                 style={
                                     "position": "relative",
                                     "width": "5%",
                                     "left": "10px",
-                                    "top": "50px",
+                                    "top": "20px",
+                                    "display": "inline-block",
                                 },
                             ),
+
+                            html.Img(
+                                id="player1_country_flag",
+                                style={
+                                    "position": "relative",
+                                    "width": "10%",
+                                    "left": "30px",
+                                    "top": "20px",
+                                    "display": "inline-block",
+                                }),
+                            html.Img(
+                                id="player1_image",
+                                style={
+                                    "position": "relative",
+                                    "width": "8%",
+                                    "height": "auto",
+                                    "left": "75px",
+                                    "top": "20px",
+                                    "display": 'inline-block'
+                                }),
+
+                            html.Img(
+                                src=app.get_asset_url("vs.png"),
+                                style={
+                                    "position": "relative",
+                                    "width": "5%",
+                                    "left": "90px",
+                                    "top": "20px",
+                                    "display": "inline-block",
+                                },
+                            ),
+
+                            html.Img(
+                                id="player2_image",
+                                style={
+                                    "position": "relative",
+                                    "width": "8%",
+                                    "height": "auto",
+                                    "left": "120px",
+                                    "top": "20px",
+                                    "display": 'inline-block'
+                                }),
+
+                            html.Img(
+                                id="player2_country_flag",
+                                style={
+                                    "position": "relative",
+                                    "width": "10%",
+                                    "left": "170px",
+                                    "top": "20px",
+                                    "display": "inline-block",
+                                }),
+
+                            html.Img(
+                                src=app.get_asset_url("player2.png"),
+                                style={
+                                    "position": "relative",
+                                    "width": "5%",
+                                    "left": "180px",
+                                    "top": "30px",
+                                    "display": "inline-block",
+                                },
+                            ),
+
                             html.Div([
                                 html.Label("Select Player 2:"),
                                 html.Br(),
@@ -154,7 +361,7 @@ app.layout = html.Div(
                                 dcc.Dropdown(
                                     id='dropdown_player_2',
                                     options=[{'label': i, 'value': j} for i, j in dict(zip(df.name, df.index)).items()],
-                                    value=3333),
+                                    value=6387),
                             ],
 
                                 style={
@@ -162,23 +369,14 @@ app.layout = html.Div(
                                     "display": "inline-block",
                                     "padding-top": "15px",
                                     "padding-bottom": "15px",
-                                    "width": "30%",
+                                    "width": "12%",
                                     "position": "relative",
-                                    "left": "150px",
-                                }, ),
-                            html.Img(
-                                src=app.get_asset_url("player2.png"),
-                                style={
-                                    "position": "relative",
-                                    "width": "5%",
                                     "left": "200px",
-                                    "top": "50px",
-                                },
-                            ),
+                                }, ),
 
                         ], className="box"),
 
-                        # Two charts radar and map
+                        # Two charts radar and map. Row 1 of viz
 
                         html.Div(
                             [
@@ -189,7 +387,12 @@ app.layout = html.Div(
                                                 html.Label(id="title_bar"),
                                                 dcc.Graph(id="radar_chart"),
                                                 html.Div(
-                                                    [html.P(id="comment")],
+                                                    [html.P(id="comment", children='This is a Radar Chart comparing '
+                                                                                   'two selected players on '
+                                                                                   'performance metric of ratio of '
+                                                                                   'matches won in different '
+                                                                                   'tournaments and surfaces, '
+                                                                                   'each color represent one player.')],
                                                     className="box_comment",
                                                 ),
                                             ],
@@ -207,7 +410,10 @@ app.layout = html.Div(
                                                 html.Label(id="title_bar2"),
                                                 dcc.Graph(id="map_chart"),
                                                 html.Div(
-                                                    [html.P(id="comment2")],
+                                                    [html.P(id="comment2", children="This is a choropleth map showing "
+                                                                                    "the location of countries where "
+                                                                                    "the two selected players are "
+                                                                                    "from.")],
                                                     className="box_comment",
                                                 ),
 
@@ -217,43 +423,73 @@ app.layout = html.Div(
                                         ),
 
                                     ],
-                                    style={"width": "40%", "display": "inline-block"},
+                                    style={"width": "60%", "display": "inline-block"},
                                 ),
                             ],
                             className="box",
                         ),
+
+                        # Row 2 of viz
+
                         html.Div(
                             [
                                 html.Div(
                                     [
-                                        html.Label(
-                                            "Empty Box",
-                                            style={"font-size": "medium"},
+                                        html.Div(
+                                            [
+                                                html.Label(id="title_bar3"),
+                                                dcc.Graph(id="rank_season"),
+                                                html.Div(
+                                                    [html.P(id="comment3", children='This line graphs shows rank of '
+                                                                                    'player 1 and player 2 over '
+                                                                                    'seasons, in case of a gap there '
+                                                                                    'maybe some abnormal behaviour.')],
+                                                    className="box_comment",
+                                                ),
+                                            ],
+                                            className="box",
+                                            style={"padding-bottom": "15px"},
                                         ),
-                                        html.Br(),
-
-                                        html.Br(),
 
                                     ],
-                                    className="box",
-                                    style={"width": "40%"},
+                                    style={"width": "100%", "display": "inline-block"},
                                 ),
+
+                            ],
+                            className="box",
+                        ),
+
+                        # Row 3 of viz
+
+                        html.Div(
+                            [
                                 html.Div(
                                     [
-                                        html.Label(
-                                            "Empty Box",
-                                            style={"font-size": "medium"},
+                                        html.Div(
+                                            [
+                                                html.Label(id="title_bar4"),
+                                                dcc.Graph(id="title_season"),
+                                                html.Div(
+                                                    [html.P(id="comment4", children='This line graphs shows no of '
+                                                                                    'titles won by '
+                                                                                    'player 1 and player 2 over '
+                                                                                    'seasons, in case of a gap there '
+                                                                                    'maybe some abnormal behaviour.')],
+                                                    className="box_comment",
+                                                ),
+                                            ],
+                                            className="box",
+                                            style={"padding-bottom": "15px"},
                                         ),
-                                        html.Br(),
-                                        html.Br(),
 
                                     ],
-                                    className="box",
-                                    style={"width": "63%"},
+                                    style={"width": "100%", "display": "inline-block"},
                                 ),
+
                             ],
-                            className="row",
+                            className="box",
                         ),
+
                         html.Div(
                             [
                                 html.Div(
@@ -282,7 +518,7 @@ app.layout = html.Div(
                                                 ),
                                                 ", ",
                                                 html.A(
-                                                    # "Second Refreence",
+                                                    # "Second Reference",
                                                     # href="http://",
                                                     # target="_blank",
                                                 ),
@@ -312,20 +548,99 @@ app.layout = html.Div(
     [Input(component_id='dropdown_player_1', component_property='value'),
      Input(component_id='dropdown_player_2', component_property='value')])
 def update_plot(player1, player2):
-    fig = radar_chart(df_radar, player1, player2)
-    fig.update_layout(template='gridon')
-    return fig
-
+    if player1 != player2:
+        fig = radar_chart(df_radar, player1, player2)
+        fig.update_layout(template='gridon')
+        return fig
+    else:
+        raise PreventUpdate
 
 
 @app.callback(
     Output(component_id='map_chart', component_property='figure'),
-    [Input(component_id='dropdown_player_1',component_property= 'value'),
-    Input(component_id='dropdown_player_2',component_property= 'value')])
+    [Input(component_id='dropdown_player_1', component_property='value'),
+     Input(component_id='dropdown_player_2', component_property='value')])
 def update_plot(player1, player2):
-    fig = show_country(player1, player2)
-    fig.update_layout(template='gridon')
-    return fig
+    if player1 != player2:
+        fig = show_country(player1, player2)
+        fig.update_layout(template='gridon')
+        return fig
+    else:
+        raise PreventUpdate
+
+
+@app.callback(Output("player1_country_flag", "src"),
+              [Input(component_id='dropdown_player_1', component_property='value')])
+def update_flag2(player_id):
+    if player_id is not None:
+        return get_country_flag(player_id)
+    else:
+        raise PreventUpdate
+
+
+@app.callback(Output("player2_country_flag", "src"),
+              [Input(component_id='dropdown_player_2', component_property='value')])
+def update_flag2(player_id):
+    if player_id is not None:
+        return get_country_flag(player_id)
+    else:
+        raise PreventUpdate
+
+
+@app.callback(Output("player1_image", "src"),
+              [Input(component_id='dropdown_player_1', component_property='value')])
+def update_image(player_id):
+    if player_id is not None:
+        id_api = api_id(player_id)
+        method_api = 'method=get_players'
+        full_url = f"{BASE_URL}{method_api}&player_key={id_api}&APIkey={API_KEY}"
+        response = requests.get(full_url)
+        player_data = response.json()
+        image_url = player_data['result'][0]['player_logo']
+        return image_url
+    else:
+        raise PreventUpdate
+
+
+@app.callback(Output("player2_image", "src"),
+              [Input(component_id='dropdown_player_2', component_property='value')])
+def update_image(player_id):
+    if player_id is not None:
+        id_api = api_id(player_id)
+        method_api = 'method=get_players'
+        full_url = f"{BASE_URL}{method_api}&player_key={id_api}&APIkey={API_KEY}"
+        response = requests.get(full_url)
+        player_data = response.json()
+        image_url = player_data['result'][0]['player_logo']
+        return image_url
+    else:
+        raise PreventUpdate
+
+
+@app.callback(
+    Output(component_id='rank_season', component_property='figure'),
+    [Input(component_id='dropdown_player_1', component_property='value'),
+     Input(component_id='dropdown_player_2', component_property='value')])
+def update_plot(player1, player2):
+    if player1 != player2:
+        fig = rank_season(player1, player2)
+        fig.update_layout(template='gridon')
+        return fig
+    else:
+        raise PreventUpdate
+
+
+@app.callback(
+    Output(component_id='title_season', component_property='figure'),
+    [Input(component_id='dropdown_player_1', component_property='value'),
+     Input(component_id='dropdown_player_2', component_property='value')])
+def update_plot(player1, player2):
+    if player1 != player2:
+        fig = title_season(player1, player2)
+        fig.update_layout(template='gridon')
+        return fig
+    else:
+        raise PreventUpdate
 
 
 if __name__ == '__main__':
