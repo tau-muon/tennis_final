@@ -195,6 +195,33 @@ def doAdaBoost(x_train,y_train,x_test,y_test,score,outPath,Dtree= None):
     y_train_pred = BoostClassifer.predict(x_train)
     return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
 
+def doKNN(x_train,y_train,x_test,y_test,score,outPath):
+    params = {
+        "n_neighbors": [i for i in range(1,50)],
+        # "weights": ["distance"]
+        
+
+    }
+    generateValidationCurve(KNeighborsClassifier,x_train,y_train,'n_neighbors',params["n_neighbors"],scoringTechnique=score,outPath =outPath)
+
+    clf = getBestfromGridSearch(KNeighborsClassifier,x_train,y_train,params,scoringTechnique=score)
+    # clf.fit(x_train,y_train)
+    generateLearningCurve(clf,x_train,y_train,scoringTechnique=score,outPath =outPath)
+    
+    y_pred = clf.predict(x_test)
+
+    print("AccuracyOptimized:",metrics.f1_score(y_test,y_pred))
+    knnClassifier = KNeighborsClassifier()
+
+    knnClassifier.fit(x_train,y_train)
+    generateLearningCurve(knnClassifier,x_train,y_train,scoringTechnique=score,outPath =outPath,base=True)
+
+    y_pred = knnClassifier.predict(x_test)
+    print("Accuracy2:",metrics.f1_score(y_test,y_pred))
+    y_train_pred = clf.predict(x_train)
+    y_pred = clf.predict(x_test)
+
+    return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
 
 if __name__ == "__main__":
     analyzeC = Analysis()
@@ -207,6 +234,8 @@ if __name__ == "__main__":
     x_train,y_train,x_test,y_test = splitAndScale(X,Y) 
     doDecisionTree(x_train,y_train,x_test,y_test,"f1",".")
     doAdaBoost(x_train,y_train,x_test,y_test,"f1",".")
+    doKNN(x_train,y_train,x_test,y_test,"f1",".")
+
 
 
 
