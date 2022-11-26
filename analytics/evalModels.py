@@ -1,4 +1,7 @@
-from sklearn.neural_network import DecisionTreeClassifier
+
+import os, sys
+
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -17,19 +20,21 @@ import time
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import validation_curve
-import analytics.Analyze as analyze
+sys.path.append(os.path.abspath("../"))
+
+from analytics.Analyze import Analysis
 def splitAndScale(X,Y):
-    x_trainPre,x_testPre,y_train,y_test = train_test_split(X,Y,test_size=0.3,random_state=42)
+    x_train,x_test,y_train,y_test = train_test_split(X,Y,test_size=0.3,random_state=42)
 
-    scaler = StandardScaler().fit(x_trainPre)
-    x_trainArray=scaler.transform(x_trainPre)
-    x_train = pd.DataFrame(x_trainArray)
-    x_train.columns=x_trainPre.columns
+    # scaler = StandardScaler().fit(x_trainPre)
+    # x_trainArray=scaler.transform(x_trainPre)
+    # x_train = pd.DataFrame(x_trainArray)
+    # x_train.columns=x_trainPre.columns
 
-    x_testArray=scaler.transform(x_testPre)
-    x_test = pd.DataFrame(x_testArray)
-    x_test.columns=x_testPre.columns  
-    return(x_train,x_test,y_train,y_test)  
+    # x_testArray=scaler.transform(x_testPre)
+    # x_test = pd.DataFrame(x_testArray)
+    # x_test.columns=x_testPre.columns  
+    return(x_train,y_train,x_test,y_test)  
     
 
 def getBestfromGridSearch(classifier,x,y,param,scoringTechnique='f1'):
@@ -114,25 +119,25 @@ def generateLearningCurve(classifier,x,y,scoringTechnique="f1",outPath="./",base
     plt.clf()
 
 
-def doDecisionTree(x_train,y_train,x_test,y_test,score):
-    path = DecisionTreeClassifier().cost_complexity_pruning_path(x_train, y_train)
-    ccp_alphas = path.ccp_alphas
+def doDecisionTree(x_train,y_train,x_test,y_test,score,outPath):
+    path = DecisionTreeClassifier()
+    # ccp_alphas = path.ccp_alphas
     tree_para = {
         'max_depth':[1,2,3,4,5,6,7,8,9,10,11,12,15,20],
-        'ccp_alpha':ccp_alphas,
+        # 'ccp_alpha':ccp_alphas,
 
         }
 
     generateValidationCurve(DecisionTreeClassifier,x_train,y_train,'max_depth',tree_para['max_depth'],scoringTechnique=score,outPath =outPath)
 
 
-    generateValidationCurve(DecisionTreeClassifier,x_train,y_train,'ccp_alpha',tree_para['ccp_alpha'],scoringTechnique=score,outPath =outPath)
+    # generateValidationCurve(DecisionTreeClassifier,x_train,y_train,'ccp_alpha',tree_para['ccp_alpha'],scoringTechnique=score,outPath =outPath)
 
 
 
     validationInsights =  {
         'max_depth' :tree_para['max_depth'],
-        'ccp_alpha' : ccp_alphas
+        # 'ccp_alpha' : ccp_alphas
     }
 
 
@@ -155,10 +160,17 @@ def doDecisionTree(x_train,y_train,x_test,y_test,score):
     y_train_pred = clf.predict(x_train)
     return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
 
+
 if __name__ == "__main__":
-    analyzeC = analyze.Analysis()
+    analyzeC = Analysis()
     df = analyzeC.create_data()
+    print(df)
+    
     Y = df['result']
+    print(Y)
     X = df.drop(columns=['result'])
     x_train,y_train,x_test,y_test = splitAndScale(X,Y) 
-    doDecisionTree(x_train,y_train,x_test,y_test,"f1")
+    doDecisionTree(x_train,y_train,x_test,y_test,"f1",".")
+
+
+

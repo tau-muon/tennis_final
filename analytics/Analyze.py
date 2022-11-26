@@ -44,6 +44,14 @@ class Analysis(object):
         df = df[df["loser_elo_rating"].notna()]
         df = df[df["winner_rank"].notna()]
         df = df[df["loser_rank"].notna()]
+        df = df[df["winner_age"].notna()]
+        df = df[df["winner_height"].notna()]
+        df = df[df["loser_age"].notna()]
+        df = df[df["loser_height"].notna()]
+        df = df[df["surface"].notna()]
+        df = df[df["best_of"].notna()]
+        df = df[df["indoor"].notna()]
+
         return df
 
 
@@ -61,21 +69,20 @@ class Analysis(object):
 
     def create_data(self):
         # TODO to check the draw data
-    
+
         # Shuffle to get the data that belongs to the player 1 and player 2
         self.match_df = self.match_df.sample(frac=1).reset_index(drop=True)
         
         merged_df = pd.merge(self.match_df, self.fe.player_df, left_on="winner_id", right_on="player_id")
         merged_df = pd.merge(merged_df, self.fe.player_df, left_on="loser_id", right_on="player_id", suffixes=("_winner", "_loser"))
         merged_df.to_csv("full_data.csv")
-
         rowcutoff = int(merged_df.shape[0]/2)
         p1_data = merged_df[:rowcutoff]
         p2_data = merged_df[rowcutoff:]
     
         # Build p1 data
         df1 = pd.DataFrame()
-        df1["match_id"] = p1_data["match_id"]
+        # df1["match_id"] = p1_data["match_id"]
         df1["surface"] = p1_data["surface"]
         df1["best_of"] = p1_data["best_of"]
         df1["indoor"] = p1_data["indoor"]
@@ -94,7 +101,7 @@ class Analysis(object):
         
         # Build p2 data
         df2 = pd.DataFrame()
-        df2["match_id"] = p2_data["match_id"]
+        # df2["match_id"] = p2_data["match_id"]
         df2["surface"] = p2_data["surface"]
         df2["best_of"] = p2_data["best_of"]
         df2["indoor"] = p2_data["indoor"]
@@ -109,6 +116,16 @@ class Analysis(object):
         df2["result"] = 2
 
         df = pd.concat([df1, df2])
+        newVals = {
+            "H":0,
+            "C":1,
+            "G":2,
+            "C":3,
+            "P":4
+        }
+        df['surface'] = df['surface'].map(newVals)
+        df ["result"] = df["result"].astype("int")
+        df["indoor"] = df["indoor"].map({False:0,True:1})
         return df.sample(frac=1).reset_index(drop=True)
 
 

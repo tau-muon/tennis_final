@@ -87,7 +87,7 @@ class FeaturesEngineering(object):
 
 
 if __name__ == "__main__":
-    output = subprocess.run(["docker", "start" ,"uts-database"], stdout=subprocess.PIPE)
+    output = subprocess.run(["sudo","docker", "start" ,"uts-database"], stdout=subprocess.PIPE)
     if output.returncode != 0:
         print(output.stdout.decode("utf-8"))
         sys.exit("Failed to launch database docker!")
