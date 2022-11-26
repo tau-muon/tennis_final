@@ -223,7 +223,7 @@ def doKNN(x_train,y_train,x_test,y_test,score,outPath):
 
     return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
 
-def doNN(x_train,y_train,x_test,y_test,"f1","."):
+def doNN(x_train,y_train,x_test,y_test,score,outPath):
     # hiddenLayers= [x for x in itertools.product(range(1,10), range(1,10),range(0,10))]
     hiddenLayers = [(5),(5,5),(5,5,5),(10),(10,10),(10,10,10),(100),(100,5),(100,100),(100,100,100)]
     parameter_space = {
@@ -249,14 +249,7 @@ def doNN(x_train,y_train,x_test,y_test,"f1","."):
     'max_iter': [i for i in range(80,140,10)]
     }
     mlp = MLPClassifier(activation="relu", max_iter=1, solver="adam",warm_start=True)
-    
-    # mlp.fit(x_train,y_train)
-    # plt.plot(mlp.loss_curve_,label="loss Curve", color="darkorange")
-    # # plt.plot(mlp.validation_scores_,label="Validation Scores", color="blue")
-    # plt.show()
-    # clf = getBestfromGridSearch(MLPClassifier,x_train,y_train,parameter_space,scoringTechnique=score)
-    # plt.plot(clf.loss_curve_)
-    # plt.show()
+
     epochs = 600
     training_mse = []
     validation_mse = []
@@ -299,13 +292,13 @@ if __name__ == "__main__":
     df = analyzeC.create_data()
     # print(df)
     
-    # Y = df['result']
+    Y = df['result']
     # print(Y)
     X = df.drop(columns=['result'])
     x_train,y_train,x_test,y_test = splitAndScale(X,Y) 
     # doDecisionTree(x_train,y_train,x_test,y_test,"f1",".")
     # doAdaBoost(x_train,y_train,x_test,y_test,"f1",".")
-    doKNN(x_train,y_train,x_test,y_test,"f1",".")
+    # doKNN(x_train,y_train,x_test,y_test,"f1",".")
     doNN(x_train,y_train,x_test,y_test,"f1",".")
 
 
