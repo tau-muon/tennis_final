@@ -223,6 +223,77 @@ def doKNN(x_train,y_train,x_test,y_test,score,outPath):
 
     return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
 
+def doNN(x_train,y_train,x_test,y_test,"f1","."):
+    # hiddenLayers= [x for x in itertools.product(range(1,10), range(1,10),range(0,10))]
+    hiddenLayers = [(5),(5,5),(5,5,5),(10),(10,10),(10,10,10),(100),(100,5),(100,100),(100,100,100)]
+    parameter_space = {
+    'hidden_layer_sizes': hiddenLayers,
+    'activation': ['tanh', 'relu','logistic'],
+    'alpha': [0.0001, 0.001,0.05],
+    'learning_rate': ['constant','adaptive'],
+    'max_iter': [220]
+    }
+    generateValidationCurve(MLPClassifier,x_train,y_train,'hidden_layer_sizes',parameter_space["hidden_layer_sizes"],[a for a in range(len(hiddenLayers))],scoringTechnique=score,outPath=outPath)
+    generateValidationCurve(MLPClassifier,x_train,y_train,'activation',parameter_space["activation"],plotRange=parameter_space["activation"],scoringTechnique=score,outPath=outPath)
+    # generateValidationCurve(MLPClassifier,x_train,y_train,'alpha',parameter_space["alpha"],plotRange=[00.001,0.001,0.05],scoringTechnique=score,outPath=outPath)
+    # generateValidationCurve(MLPClassifier,x_train,y_train,'learning_rate',parameter_space["learning_rate"],plotRange=[0,1],scoringTechnique=score,outPath=outPath)
+    # generateValidationCurve(MLPClassifier,x_train,y_train,'max_iter',parameter_space["max_iter"],scoringTechnique=score)
+    hiddenLayers = [(5),(5,5),(5,5,5),(10),(10,10),(10,10,10)]
+    parameter_space = {
+    'hidden_layer_sizes': hiddenLayers,
+    'activation': ['relu'],
+    # 'solver': ['sgd', 'adam'],
+    # 'alpha': [0.0001, 0.001,0.05],
+    # 'learning_rate': ['constant','adaptive'],
+    # 'max_iter':[i for i in range(200,2500,100)]
+    'max_iter': [i for i in range(80,140,10)]
+    }
+    mlp = MLPClassifier(activation="relu", max_iter=1, solver="adam",warm_start=True)
+    
+    # mlp.fit(x_train,y_train)
+    # plt.plot(mlp.loss_curve_,label="loss Curve", color="darkorange")
+    # # plt.plot(mlp.validation_scores_,label="Validation Scores", color="blue")
+    # plt.show()
+    # clf = getBestfromGridSearch(MLPClassifier,x_train,y_train,parameter_space,scoringTechnique=score)
+    # plt.plot(clf.loss_curve_)
+    # plt.show()
+    epochs = 600
+    training_mse = []
+    validation_mse = []
+    x_trainEpoch,xvalidate,y_trainEpoch,y_validate= train_test_split(x_train,y_train,test_size=0.35,random_state=42)
+    for epoch in range(epochs):
+        mlp.fit(x_trainEpoch, y_trainEpoch) 
+        Y_pred = mlp.predict(x_trainEpoch)
+        curr_train_score = mean_squared_error(y_trainEpoch, Y_pred) # training performances
+        Y_pred = mlp.predict(xvalidate) 
+        curr_valid_score = mean_squared_error(y_validate, Y_pred) # validation performances
+        training_mse.append(curr_train_score) # list of training perf to plot
+        validation_mse.append(curr_valid_score) # list of valid perf to plot
+    
+    plt.title("iterative Learning curve for " + MLPClassifier().__class__.__name__)
+    plt.xlabel('Epoch')
+    plt.ylabel("Mean Squared Error")
+    plt.plot(training_mse,label="training mse", color="darkorange")
+    plt.plot(validation_mse,label="validation mse", color="blue")
+    plt.legend(loc="best")
+    plt.savefig(outPath+"Iterative Learning Curve_"+MLPClassifier().__class__.__name__+"epoch")
+    plt.clf()
+    clf = getBestfromGridSearch(MLPClassifier,x_train,y_train,parameter_space,scoringTechnique=score)
+    generateLearningCurve(clf,x_train,y_train,scoringTechnique=score,outPath =outPath)
+    y_pred = clf.predict(x_test)
+    print("AccuracyOptimized:",metrics.f1_score(y_test,y_pred))
+
+    NNClassifier = MLPClassifier(hidden_layer_sizes=(10,10,10),max_iter=1000)
+    NNClassifier.fit(x_train,y_train)
+    generateLearningCurve(NNClassifier,x_train,y_train,scoringTechnique=score,outPath =outPath,base=True)
+
+    y_pred = NNClassifier.predict(x_test)
+    print("Accuracy:",metrics.f1_score(y_test,y_pred))
+    y_train_pred = clf.predict(x_train)
+    y_pred = clf.predict(x_test)
+
+    return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
+
 if __name__ == "__main__":
     analyzeC = Analysis()
     df = analyzeC.create_data()
@@ -235,6 +306,7 @@ if __name__ == "__main__":
     # doDecisionTree(x_train,y_train,x_test,y_test,"f1",".")
     # doAdaBoost(x_train,y_train,x_test,y_test,"f1",".")
     doKNN(x_train,y_train,x_test,y_test,"f1",".")
+    doNN(x_train,y_train,x_test,y_test,"f1",".")
 
 
 
