@@ -226,14 +226,14 @@ def doKNN(x_train,y_train,x_test,y_test,score,outPath):
 if __name__ == "__main__":
     analyzeC = Analysis()
     df = analyzeC.create_data()
-    print(df)
+    # print(df)
     
-    Y = df['result']
-    print(Y)
+    # Y = df['result']
+    # print(Y)
     X = df.drop(columns=['result'])
     x_train,y_train,x_test,y_test = splitAndScale(X,Y) 
-    doDecisionTree(x_train,y_train,x_test,y_test,"f1",".")
-    doAdaBoost(x_train,y_train,x_test,y_test,"f1",".")
+    # doDecisionTree(x_train,y_train,x_test,y_test,"f1",".")
+    # doAdaBoost(x_train,y_train,x_test,y_test,"f1",".")
     doKNN(x_train,y_train,x_test,y_test,"f1",".")
 
 
