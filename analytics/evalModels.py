@@ -159,6 +159,41 @@ def doDecisionTree(x_train,y_train,x_test,y_test,score,outPath):
 
     y_train_pred = clf.predict(x_train)
     return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
+def doAdaBoost(x_train,y_train,x_test,y_test,score,outPath,Dtree= None):
+
+    max_depths=[1,2,3,4,5,6,7,8,9,10,11,12,15,20]
+    dtClassifiers2=[]
+    for depth in max_depths:
+        dtClassifiers2.append(DecisionTreeClassifier(max_depth=depth))
+    generateValidationCurve(AdaBoostClassifier,x_train,y_train,'n_estimators',[1,3,5,10,20,30,40,50,60,70,80,90,100,150,200,250,300],classifierParams=Dtree,scoringTechnique=score,outPath =outPath)
+    generateValidationCurve(AdaBoostClassifier,x_train,y_train,'base_estimator',dtClassifiers2,plotRange=max_depths,scoringTechnique=score,outPath =outPath)
+
+
+    updatedClassifiers = []
+
+    updatedClassifiers.extend(dtClassifiers2)
+    validationInsights =  {
+        'n_estimators' :[10,20,30,40,50,60,70,80,90,100],
+        'base_estimator' : dtClassifiers2
+    }
+
+    clf = getBestfromGridSearch(AdaBoostClassifier,x_train,y_train,validationInsights,scoringTechnique=score)
+    generateLearningCurve(clf,x_train,y_train,scoringTechnique=score,outPath =outPath)
+
+
+    y_pred = clf.predict(x_test)
+
+    print("AccuracyOptimized:",metrics.f1_score(y_test,y_pred))
+
+    BoostClassifer = AdaBoostClassifier(n_estimators=50)
+    BoostClassifer.fit(x_train,y_train)
+    generateLearningCurve(BoostClassifer,x_train,y_train,scoringTechnique=score,outPath =outPath,base=True)
+
+
+    y_pred = BoostClassifer.predict(x_test)
+    print("Accuracy2:",metrics.f1_score(y_test,y_pred))
+    y_train_pred = BoostClassifer.predict(x_train)
+    return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
 
 
 if __name__ == "__main__":
@@ -171,6 +206,7 @@ if __name__ == "__main__":
     X = df.drop(columns=['result'])
     x_train,y_train,x_test,y_test = splitAndScale(X,Y) 
     doDecisionTree(x_train,y_train,x_test,y_test,"f1",".")
+    doAdaBoost(x_train,y_train,x_test,y_test,"f1",".")
 
 
 
