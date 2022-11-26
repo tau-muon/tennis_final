@@ -3,6 +3,6 @@ Thve visualization shown in the link below, is linked to a diffreent github acco
 
 app deployed on https://render.com
 
-https://tennis-app-ubrt.onrender.com
+https://tennis-app-v2.onrender.com/
 
 Dash sample apps: https://dash.gallery/Portal/
