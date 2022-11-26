@@ -64,4 +64,3 @@ def list_of_players(df):
 
 def current_ranking(p_key, df):
     return int(df[df['player_key'] == str(p_key)]['place'])
-

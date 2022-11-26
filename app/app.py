@@ -6,9 +6,17 @@ import numpy as np
 import plotly.graph_objs as go
 import plotly.express as px
 import requests
+import json
 from dash import html, dcc
 from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
+
+# Helper functions
+
+def get_standings(api_key):
+    url = f"https://api.api-tennis.com/tennis/?method=get_standings&event_type=ATP&APIkey={api_key}"
+    response = requests.get(url)
+    return json.loads(response.text)['result']
 
 # Read the data
 
@@ -20,11 +28,13 @@ df_radar = df[["name", "matches_win_percentage", "grand_slam_win_percentage", "t
                "outdoor_matches_win_percentage", "indoor_matches_win_percentage"]]
 
 BASE_URL = 'https://api.api-tennis.com/tennis/?'
-API_KEY = 'ea89424e9ed0b69d1386acb1ee3c2ae8869cb1b9a5af231f377772842b8c2b26'
+API_KEY = "ea60e20b6b5c56a9b7f6102c93047fe6e96610565fb73fb2015be77983c4243a"
 method = 'method=get_players'
 
 
+standings = pd.DataFrame(get_standings(API_KEY))[["player", "place", "points", 'player_key']]
 # country_code = dict(df["country_id"])
+
 
 
 # Function for figures
@@ -220,6 +230,60 @@ def title_season(player1_id, player2_id):
 
     # fig.update_layout(template="plotly_white")
     return fig
+
+def age(df, id_1, id_2):
+    df['age'] = (pd.to_datetime("today") - pd.to_datetime(df["dob"])) / np.timedelta64(1, 'Y')
+    age1 = df.loc[id_1]['age']
+    age2 = df.loc[id_2]['age']
+    ln1 = df.loc[id_1]['last_name']
+    ln2 = df.loc[id_2]['last_name']
+    
+    fig = go.Figure()
+
+    fig.add_trace(go.Indicator(
+        mode = "number",
+        value = np.floor(age1),
+        number = {'prefix': f"{ln1}: "},
+        delta = {'position': "top", 'reference': 320},
+        domain = {'x': [0, 1], 'y': [0.5, 1]}))
+
+    fig.add_trace(go.Indicator(
+        mode = "number",
+        value = np.floor(age2),
+        number = {'prefix': f"{ln2}: "},
+        delta = {'position': "top", 'reference': 320},
+        domain = {'x': [0, 1], 'y': [0, 1]}))
+
+    return fig
+
+def rank(df, standings, id_1, id_2):
+    ln1 = df.loc[id_1]['last_name']
+    ln2 = df.loc[id_2]['last_name']
+    api_id1 = api_id(id_1)
+    api_id2 = api_id(id_2)
+    rank1 = int(standings[standings['player_key'] == str(api_id1)]["place"].to_list()[0])
+    rank2 = int(standings[standings['player_key'] == str(api_id2)]["place"].to_list()[0])
+
+    fig = go.Figure()
+    fig.add_trace(go.Indicator(
+        mode = "number",
+        value = np.floor(rank1),
+        number = {'prefix': f"{ln1}: "},
+        delta = {'position': "top", 'reference': 320},
+        domain = {'x': [0, 1], 'y': [0.5, 1]}))
+
+    fig.add_trace(go.Indicator(
+        mode = "number",
+        value = np.floor(rank2),
+        number = {'prefix': f"{ln2}: "},
+        delta = {'position': "top", 'reference': 320},
+        domain = {'x': [0, 1], 'y': [0, 1]}))
+
+    return fig
+
+
+
+
 
 
 # ------------------------------------------------------ APP ------------------------------------------------------
@@ -490,6 +554,55 @@ app.layout = html.Div(
                             className="box",
                         ),
 
+                        # Two Indicators age and current ranking. Row 4 of viz
+
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.Div(
+                                            [
+                                                html.Label(id="title_bar5"),
+                                                dcc.Graph(id="age"),
+                                                html.Div(
+                                                    [html.P(id="comment5", children='This indicator shows the age '
+                                                                                   'of each player ')],
+                                                    className="box_comment",
+                                                ),
+                                            ],
+                                            className="box",
+                                            style={"padding-bottom": "15px"},
+                                        ),
+
+                                    ],
+                                    style={"width": "50%", "display": "inline-block"},
+                                ),
+                                html.Div(
+                                    [
+                                        html.Div(
+                                            [
+                                                html.Label(id="title_bar6"),
+                                                dcc.Graph(id="rank"),
+                                                html.Div(
+                                                    [html.P(id="comment6", children="This indicator shows the current "
+                                                                                    "rank of each player  ")],
+                                                    className="box_comment",
+                                                ),
+
+                                            ],
+                                            className="box",
+                                            style={"padding-bottom": "15px"},
+                                        ),
+
+                                    ],
+                                    style={"width": "50%", "display": "inline-block"},
+                                ),
+                            ],
+                            className="box",
+                        ),
+
+                        
+
                         html.Div(
                             [
                                 html.Div(
@@ -642,6 +755,29 @@ def update_plot(player1, player2):
     else:
         raise PreventUpdate
 
+@app.callback(
+    Output(component_id='age', component_property='figure'),
+    [Input(component_id='dropdown_player_1', component_property='value'),
+     Input(component_id='dropdown_player_2', component_property='value')])
+def update_plot(player1, player2):
+    if player1 != player2:
+        fig = age(df, player1, player2)
+        fig.update_layout(template='gridon')
+        return fig
+    else:
+        raise PreventUpdate
+
+@app.callback(
+    Output(component_id='rank', component_property='figure'),
+    [Input(component_id='dropdown_player_1', component_property='value'),
+     Input(component_id='dropdown_player_2', component_property='value')])
+def update_plot(player1, player2):
+    if player1 != player2:
+        fig = rank(df, standings, player1, player2)
+        fig.update_layout(template='gridon')
+        return fig
+    else:
+        raise PreventUpdate
 
 if __name__ == '__main__':
     app.run_server(debug=True)
