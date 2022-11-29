@@ -93,7 +93,7 @@ def show_country(player_id_1, player_id_2):
                       title_font_size=40, title_font_color='green', paper_bgcolor='white', plot_bgcolor='red')
     fig.update_layout(
         margin=dict(l=20, r=20, t=20, b=20),
-        paper_bgcolor="LightSteelBlue",
+        #paper_bgcolor="LightSteelBlue",
     )
     return fig
 
@@ -520,7 +520,7 @@ app.layout = html.Div(
                                                 html.Label(id="title_bar"),
                                                 dcc.Graph(id="radar_chart"),
                                                 html.Div(
-                                                    [html.P(id="comment", children='This is a Radar Chart comparing '
+                                                    [html.P(id="comment", children='Radar Chart comparing '
                                                                                    'two selected players on '
                                                                                    'performance metric of ratio of '
                                                                                    'matches won in different '
@@ -543,7 +543,7 @@ app.layout = html.Div(
                                                 html.Label(id="title_bar2"),
                                                 dcc.Graph(id="map_chart"),
                                                 html.Div(
-                                                    [html.P(id="comment2", children="This is a choropleth map showing "
+                                                    [html.P(id="comment2", children="Choropleth map showing "
                                                                                     "the location of countries where "
                                                                                     "the two selected players are "
                                                                                     "from.")],
@@ -573,7 +573,7 @@ app.layout = html.Div(
                                                 html.Label(id="title_bar3"),
                                                 dcc.Graph(id="rank_season"),
                                                 html.Div(
-                                                    [html.P(id="comment3", children='This line graphs shows rank of '
+                                                    [html.P(id="comment3", children='Line graphs shows rank of '
                                                                                     'player 1 and player 2 over '
                                                                                     'seasons, in case of a gap there '
                                                                                     'maybe some abnormal behaviour.')],
@@ -603,7 +603,7 @@ app.layout = html.Div(
                                                 html.Label(id="title_bar4"),
                                                 dcc.Graph(id="title_season"),
                                                 html.Div(
-                                                    [html.P(id="comment4", children='This line graphs shows no of '
+                                                    [html.P(id="comment4", children='Line graphs shows no of '
                                                                                     'titles won by '
                                                                                     'player 1 and player 2 over '
                                                                                     'seasons, in case of a gap there '
