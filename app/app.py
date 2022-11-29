@@ -439,6 +439,75 @@ app.layout = html.Div(
                                 }, ),
 
                         ], className="box"),
+                        
+                        # -----------------------Select parameters for prediction
+
+                        html.Div([
+                            html.Div([
+
+                                html.Label("Select Surface:"),
+                                html.Br(),
+                                html.Br(),
+                                dcc.RadioItems(id='surface_type',
+                                               options={
+                                                   'G': 'Grass',
+                                                   'C': 'Clay',
+                                                   'H': 'Hard'
+                                               },
+                                               value='Grass'
+                                               )
+                            ],
+                                style={
+                                    "margin": "5px",
+                                    "display": "inline-block",
+                                    "padding-top": "5px",
+                                    "padding-bottom": "5px",
+                                    "width": "33%",
+                                }, ),
+
+                            html.Div([
+                                html.Label("Indoor or Outdoor:"),
+                                html.Br(),
+                                html.Br(),
+                                dcc.RadioItems(id='in_out',
+                                               options={
+                                                   1: 'Indoor',
+                                                   0: 'Outdoor',
+                                               },
+                                               value='Indoor'
+                                               )
+                            ],
+                                style={
+                                    "margin": "5px",
+                                    "display": "inline-block",
+                                    "padding-top": "5px",
+                                    "padding-bottom": "5px",
+                                    "width": "30%",
+                                }, ),
+
+                            html.Div([
+                                html.Label("Best Of:"),
+                                html.Br(),
+                                html.Br(),
+                                dcc.RadioItems(id='best_of',
+                                               options={
+                                                   '3': 'Best of 3',
+                                                   '5': 'Best of 5',
+                                               },
+                                               value='Best of 3'
+                                               )
+                            ],
+                                style={
+                                    "margin": "5px",
+                                    "display": "inline-block",
+                                    "padding-top": "5px",
+                                    "padding-bottom": "5px",
+                                    "width": "33%",
+                                }, ),
+
+                        ], className="box"),
+
+                        # -----------------
 
                         # Two charts radar and map. Row 1 of viz
 
