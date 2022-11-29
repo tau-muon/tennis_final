@@ -3,7 +3,7 @@ import os, sys
 
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split # Import train_test_split function
@@ -123,7 +123,7 @@ def doDecisionTree(x_train,y_train,x_test,y_test,score,outPath):
     path = DecisionTreeClassifier()
     # ccp_alphas = path.ccp_alphas
     tree_para = {
-        'max_depth':[1,2,3,4,5,6,7,8,9,10,11,12,15,20],
+        'max_depth':[1,2,3,4,5,6,7,8,9,10, 50, 100],
         # 'ccp_alpha':ccp_alphas,
 
         }
@@ -147,6 +147,14 @@ def doDecisionTree(x_train,y_train,x_test,y_test,score,outPath):
 
     y_pred = clf.predict(x_test)
 
+    
+    print("Feature Importances:")
+    feature_importances = clf.feature_importances_
+    sorted_indices =np.array(feature_importances).argsort()[::-1]
+    print(feature_importances)
+    print(sorted_indices)
+    print(x_train.columns[sorted_indices])
+
     print("AccuracyOptimized:",metrics.f1_score(y_test,y_pred))
 
     DecisionClassifier = DecisionTreeClassifier()
@@ -154,18 +162,21 @@ def doDecisionTree(x_train,y_train,x_test,y_test,score,outPath):
     generateLearningCurve(DecisionClassifier,x_train,y_train,scoringTechnique=score,outPath =outPath,base=True)
 
     y_pred = DecisionClassifier.predict(x_test)
-    print("Accuracy2:",metrics.f1_score(y_test,y_pred))
-    y_pred = clf.predict(x_test)
+    # print("Accuracy2:",metrics.f1_score(y_test,y_pred))
 
+
+    y_test_pred = clf.predict(x_test)
     y_train_pred = clf.predict(x_train)
-    return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
+    return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_test_pred))
+
+
 def doAdaBoost(x_train,y_train,x_test,y_test,score,outPath,Dtree= None):
 
     max_depths=[1,2,3,4,5,6,7,8,9,10,11,12,15,20]
     dtClassifiers2=[]
     for depth in max_depths:
         dtClassifiers2.append(DecisionTreeClassifier(max_depth=depth))
-    generateValidationCurve(AdaBoostClassifier,x_train,y_train,'n_estimators',[1,3,5,10,20,30,40,50,60,70,80,90,100,150,200,250,300],classifierParams=Dtree,scoringTechnique=score,outPath =outPath)
+    generateValidationCurve(AdaBoostClassifier,x_train,y_train,'n_estimators',[1,3,5,10,20,30,40,90,100,150,200,250,300],classifierParams=Dtree,scoringTechnique=score,outPath =outPath)
     generateValidationCurve(AdaBoostClassifier,x_train,y_train,'base_estimator',dtClassifiers2,plotRange=max_depths,scoringTechnique=score,outPath =outPath)
 
 
@@ -191,7 +202,7 @@ def doAdaBoost(x_train,y_train,x_test,y_test,score,outPath,Dtree= None):
 
 
     y_pred = BoostClassifer.predict(x_test)
-    print("Accuracy2:",metrics.f1_score(y_test,y_pred))
+    # print("Accuracy2:",metrics.f1_score(y_test,y_pred))
     y_train_pred = BoostClassifer.predict(x_train)
     return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
 
@@ -238,7 +249,7 @@ def doNN(x_train,y_train,x_test,y_test,score,outPath):
     # generateValidationCurve(MLPClassifier,x_train,y_train,'alpha',parameter_space["alpha"],plotRange=[00.001,0.001,0.05],scoringTechnique=score,outPath=outPath)
     # generateValidationCurve(MLPClassifier,x_train,y_train,'learning_rate',parameter_space["learning_rate"],plotRange=[0,1],scoringTechnique=score,outPath=outPath)
     # generateValidationCurve(MLPClassifier,x_train,y_train,'max_iter',parameter_space["max_iter"],scoringTechnique=score)
-    hiddenLayers = [(5),(5,5),(5,5,5),(10),(10,10),(10,10,10)]
+    hiddenLayers = [(3),(3,3),(5,5),(5,5,5),(10),(10,10),(10,10,10)]
     parameter_space = {
     'hidden_layer_sizes': hiddenLayers,
     'activation': ['relu'],
@@ -248,7 +259,7 @@ def doNN(x_train,y_train,x_test,y_test,score,outPath):
     # 'max_iter':[i for i in range(200,2500,100)]
     'max_iter': [i for i in range(80,140,10)]
     }
-    mlp = MLPClassifier(activation="relu", max_iter=1, solver="adam",warm_start=True)
+    mlp = MLPClassifier(activation="relu", max_iter=10, solver="adam",warm_start=True)
 
     epochs = 600
     training_mse = []
@@ -271,9 +282,13 @@ def doNN(x_train,y_train,x_test,y_test,score,outPath):
     plt.legend(loc="best")
     plt.savefig(outPath+"Iterative Learning Curve_"+MLPClassifier().__class__.__name__+"epoch")
     plt.clf()
+
     clf = getBestfromGridSearch(MLPClassifier,x_train,y_train,parameter_space,scoringTechnique=score)
     generateLearningCurve(clf,x_train,y_train,scoringTechnique=score,outPath =outPath)
     y_pred = clf.predict(x_test)
+
+    print("Feature Importances:")
+    print(clf.feature_importances_)
     print("AccuracyOptimized:",metrics.f1_score(y_test,y_pred))
 
     NNClassifier = MLPClassifier(hidden_layer_sizes=(10,10,10),max_iter=1000)
@@ -281,25 +296,80 @@ def doNN(x_train,y_train,x_test,y_test,score,outPath):
     generateLearningCurve(NNClassifier,x_train,y_train,scoringTechnique=score,outPath =outPath,base=True)
 
     y_pred = NNClassifier.predict(x_test)
-    print("Accuracy:",metrics.f1_score(y_test,y_pred))
+    # print("Accuracy:",metrics.f1_score(
+    # y_test,y_pred))
     y_train_pred = clf.predict(x_train)
     y_pred = clf.predict(x_test)
 
     return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
 
+
+def doGradientBoosting(x_train,y_train,x_test,y_test,score,outPath,Dtree= None):
+
+    max_depths=[1,2,3,4,5,6,7,8,9,10,11,12,15,20]
+    dtClassifiers2=[]
+    for depth in max_depths:
+        dtClassifiers2.append(DecisionTreeClassifier(max_depth=depth))
+    generateValidationCurve(GradientBoostingClassifier,x_train,y_train,'n_estimators',[1,3,5,10,20,30,40,50,60,70,80,90,100,150,200,250,300],classifierParams=Dtree,scoringTechnique=score,outPath =outPath)
+    generateValidationCurve(GradientBoostingClassifier,x_train,y_train,'base_estimator',dtClassifiers2,plotRange=max_depths,scoringTechnique=score,outPath =outPath)
+
+
+    updatedClassifiers = []
+
+    updatedClassifiers.extend(dtClassifiers2)
+    validationInsights =  {
+        'n_estimators' :[10,20,30,40,50,60,70,80,90,100],
+        'base_estimator' : dtClassifiers2
+    }
+
+    clf = getBestfromGridSearch(GradientBoostingClassifier,x_train,y_train,validationInsights,scoringTechnique=score)
+    generateLearningCurve(clf,x_train,y_train,scoringTechnique=score,outPath =outPath)
+
+
+    y_pred = clf.predict(x_test)
+
+    print("Feature Importances:")
+    feature_importances = clf.feature_importances_
+    sorted_indices =np.array(feature_importances).argsort()[::-1]
+    print(feature_importances)
+    print(sorted_indices)
+    print(x_train.columns[sorted_indices])
+
+
+    print("AccuracyOptimized:",metrics.f1_score(y_test,y_pred))
+
+    BoostClassifer = GradientBoostingClassifier(n_estimators=50)
+    BoostClassifer.fit(x_train,y_train)
+    generateLearningCurve(BoostClassifer,x_train,y_train,scoringTechnique=score,outPath =outPath,base=True)
+
+
+    y_pred = BoostClassifer.predict(x_test)
+    print("Accuracy2:",metrics.f1_score(y_test,y_pred))
+    y_train_pred = BoostClassifer.predict(x_train)
+    return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
+
+
 if __name__ == "__main__":
     analyzeC = Analysis()
     df = analyzeC.create_data()
-    # print(df)
-    
+    df.to_csv("./data_debug.csv")
+
     Y = df['result']
-    # print(Y)
     X = df.drop(columns=['result'])
     x_train,y_train,x_test,y_test = splitAndScale(X,Y) 
-    # doDecisionTree(x_train,y_train,x_test,y_test,"f1",".")
-    # doAdaBoost(x_train,y_train,x_test,y_test,"f1",".")
+
+    # train_score, test_score = doDecisionTree(x_train,y_train,x_test,y_test,"f1",".")
+
+    # doGradientBoosting(x_train,y_train,x_test,y_test,"f1",".")
+        
+    train_score, test_score = doNN(x_train,y_train,x_test,y_test,"f1",".")
+
+    # train_score, test_score = doAdaBoost(x_train,y_train,x_test,y_test,"f1",".")
     # doKNN(x_train,y_train,x_test,y_test,"f1",".")
-    doNN(x_train,y_train,x_test,y_test,"f1",".")
+
+    print("Train Score:", train_score)
+    print("Test Score:", test_score)
+    
 
 
 
