@@ -293,13 +293,18 @@ def summ_table(df, standings, id_1, id_2):
     rank1 = int(standings[standings['player_key'] == str(api_id1)]["place"].to_list()[0])
     rank2 = int(standings[standings['player_key'] == str(api_id2)]["place"].to_list()[0])
     
-    hn1 = df.loc[id_1]['height']
-    hn2 = df.loc[id_2]['height'] 
-    wn1 = df.loc[id_1]['weight']
-    wn2 = df.loc[id_2]['weight']
+    h1 = df.loc[id_1]['height']
+    h2 = df.loc[id_2]['height'] 
+    w1 = df.loc[id_1]['weight']
+    w2 = df.loc[id_2]['weight']
     tp1 = df.loc[id_1]['turned_pro']
     tp2 = df.loc[id_2]['turned_pro']
 
+    data = dict(values=[[age1, rank1, h1, w1, tp1], ['Age', "Rank", "Height", "Weight", "Turned Pro"], [age2, rank2, h2, w2, tp2]])
+
+    fig = go.Figure(data=[go.Table(header=dict(Values=[ln1, ' ', ln2]), cells=data)])
+
+    return fig
 
 # ------------------------------------------------------ APP ------------------------------------------------------
 
