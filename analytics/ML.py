@@ -3,6 +3,7 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 import pandas as pd
 import sys, os
+import pickle
 
 sys.path.append(os.path.abspath("../"))
 from analytics.Analyze import Analysis
@@ -17,11 +18,13 @@ class MLModel(object):
 
     def _prepareModel(self,analysisI):
         #Dummy model for Now
-        model = DecisionTreeClassifier()
-        df = analysisI.create_data()
-        Y = df['result']
-        X = df.drop(columns=['result'])  
-        model.fit(X,Y)
+        model = pickle.load(open('model.pkl', 'rb'))
+        # model = DecisionTreeClassifier()
+        # df = analysisI.create_data()
+        # Y = df['result']
+        # X = df.drop(columns=['result'])  
+        # model.fit(X,Y)
+        # pickle.dump(model, open('model.pkl', 'wb'))
         return model
 
     def predict(self,P1Info,P2Info,Surface,bestOf,indoor):
@@ -36,7 +39,6 @@ class MLModel(object):
             surface_win_p = self.playerData.loc[self.playerData['player_id'] == ID1, "clay_matches_won"].iloc[0] / self.playerData.loc[self.playerData['player_id'] == ID2, "clay_matches_won"].iloc[0]
         
         if indoor == 1:
-            print()
             indoor_p = self.playerData.loc[self.playerData['player_id'] == ID1, "indoor_matches_won"].iloc[0] / self.playerData.loc[self.playerData['player_id'] == ID2, "indoor_matches_won"].iloc[0]
         elif indoor == 0:
             indoor_p = self.playerData.loc[self.playerData['player_id'] == ID1, "outdoor_matches_won"].iloc[0] / self.playerData.loc[self.playerData['player_id'] == ID2, "outdoor_matches_won"].iloc[0]
@@ -54,7 +56,6 @@ class MLModel(object):
 
         df['surface'] = df['surface'].map(newVals)
         prediction = self.model.predict(df)[0]
-        print(prediction)
         if prediction == 1:
             return ID1
         else:
