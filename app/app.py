@@ -281,9 +281,24 @@ def rank(df, standings, id_1, id_2):
 
     return fig
 
+def summ_table(df, standings, id_1, id_2):
+    df['age'] = (pd.to_datetime("today") - pd.to_datetime(df["dob"])) / np.timedelta64(1, 'Y')
+    age1 = df.loc[id_1]['age']
+    age2 = df.loc[id_2]['age']
+    ln1 = df.loc[id_1]['last_name']
+    ln2 = df.loc[id_2]['last_name']
 
-
-
+    api_id1 = api_id(id_1)
+    api_id2 = api_id(id_2)
+    rank1 = int(standings[standings['player_key'] == str(api_id1)]["place"].to_list()[0])
+    rank2 = int(standings[standings['player_key'] == str(api_id2)]["place"].to_list()[0])
+    
+    hn1 = df.loc[id_1]['height']
+    hn2 = df.loc[id_2]['height'] 
+    wn1 = df.loc[id_1]['weight']
+    wn2 = df.loc[id_2]['weight']
+    tp1 = df.loc[id_1]['turned_pro']
+    tp2 = df.loc[id_2]['turned_pro']
 
 
 # ------------------------------------------------------ APP ------------------------------------------------------
