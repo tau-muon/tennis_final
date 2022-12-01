@@ -15,8 +15,8 @@ class Analysis(object):
     """ Class created to perform the necessary data analysis and cleaning
     """
 
-    def __init__(self) -> None:
-        self.fe = FeaturesEngineering()
+    def __init__(self,mode="eval") -> None:
+        self.fe = FeaturesEngineering(mode=mode)
 
         self.match_df = self.clean()
         # self.original_df = self.create_data()
@@ -234,6 +234,14 @@ class Analysis(object):
         self.fe.match_df
         return
 
+    def getPlayerData(self):
+        self.fe.player_performance_df["clay_matches_won"] = self.fe.player_performance_df["clay_matches_won"].replace(np.nan, 0.5)
+        self.fe.player_performance_df["grass_matches_won"] = self.fe.player_performance_df["grass_matches_won"].replace(np.nan, 0.5)
+        self.fe.player_performance_df["hard_matches_won"] = self.fe.player_performance_df["hard_matches_won"].replace(np.nan, 0.5)
+        self.fe.player_performance_df["indoor_matches_won"] = self.fe.player_performance_df["indoor_matches_won"].replace(np.nan, 0.5)
+        self.fe.player_performance_df["outdoor_matches_won"] = self.fe.player_performance_df["outdoor_matches_won"].replace(np.nan, 0.5)
+
+        return self.fe.player_performance_df
 
     def map_y(self):
         # y values are either 0, 1, 2 
@@ -248,7 +256,7 @@ class Analysis(object):
         return
 
 
-# if __name__ == "__main__":
-#     a = Analysis()
-#     a.create_data()
+if __name__ == "__main__":
+    a = Analysis(mode="prod")
+    a.create_data()
 #     a.original_df.to_csv("origina_data.csv")

@@ -9,8 +9,8 @@ from analytics.Database import Database
 READ_LOCALLY = True
 
 class FeaturesEngineering(object):
-    def __init__(self) -> None:
-        if not READ_LOCALLY:
+    def __init__(self,mode="eval") -> None:
+        if not READ_LOCALLY or mode == "eval":
             self.db = Database()
             # Player data
             self.player_df = self.get_active_player_table()
