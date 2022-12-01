@@ -93,7 +93,7 @@ def show_country(player_id_1, player_id_2):
                       title_font_size=40, title_font_color='green', paper_bgcolor='white', plot_bgcolor='red')
     fig.update_layout(
         margin=dict(l=20, r=20, t=20, b=20),
-        paper_bgcolor="LightSteelBlue",
+        #paper_bgcolor="LightSteelBlue",
     )
     return fig
 
@@ -281,10 +281,30 @@ def rank(df, standings, id_1, id_2):
 
     return fig
 
+def summ_table(df, standings, id_1, id_2):
+    df['age'] = (pd.to_datetime("today") - pd.to_datetime(df["dob"])) / np.timedelta64(1, 'Y')
+    age1 = df.loc[id_1]['age']
+    age2 = df.loc[id_2]['age']
+    ln1 = df.loc[id_1]['last_name']
+    ln2 = df.loc[id_2]['last_name']
 
+    api_id1 = api_id(id_1)
+    api_id2 = api_id(id_2)
+    rank1 = int(standings[standings['player_key'] == str(api_id1)]["place"].to_list()[0])
+    rank2 = int(standings[standings['player_key'] == str(api_id2)]["place"].to_list()[0])
+    
+    h1 = df.loc[id_1]['height']
+    h2 = df.loc[id_2]['height'] 
+    w1 = df.loc[id_1]['weight']
+    w2 = df.loc[id_2]['weight']
+    tp1 = df.loc[id_1]['turned_pro']
+    tp2 = df.loc[id_2]['turned_pro']
 
+    data = dict(values=[[age1, rank1, h1, w1, tp1], ['Age', "Rank", "Height", "Weight", "Turned Pro"], [age2, rank2, h2, w2, tp2]])
 
+    fig = go.Figure(data=[go.Table(header=dict(Values=[ln1, ' ', ln2]), cells=data)])
 
+    return fig
 
 # ------------------------------------------------------ APP ------------------------------------------------------
 
@@ -439,6 +459,75 @@ app.layout = html.Div(
                                 }, ),
 
                         ], className="box"),
+                        
+                        # -----------------------Select parameters for prediction
+
+                        html.Div([
+                            html.Div([
+
+                                html.Label("Select Surface:"),
+                                html.Br(),
+                                html.Br(),
+                                dcc.RadioItems(id='surface_type',
+                                               options={
+                                                   'G': 'Grass',
+                                                   'C': 'Clay',
+                                                   'H': 'Hard'
+                                               },
+                                               value='Grass'
+                                               )
+                            ],
+                                style={
+                                    "margin": "5px",
+                                    "display": "inline-block",
+                                    "padding-top": "5px",
+                                    "padding-bottom": "5px",
+                                    "width": "33%",
+                                }, ),
+
+                            html.Div([
+                                html.Label("Indoor or Outdoor:"),
+                                html.Br(),
+                                html.Br(),
+                                dcc.RadioItems(id='in_out',
+                                               options={
+                                                   1: 'Indoor',
+                                                   0: 'Outdoor',
+                                               },
+                                               value='Indoor'
+                                               )
+                            ],
+                                style={
+                                    "margin": "5px",
+                                    "display": "inline-block",
+                                    "padding-top": "5px",
+                                    "padding-bottom": "5px",
+                                    "width": "30%",
+                                }, ),
+
+                            html.Div([
+                                html.Label("Best Of:"),
+                                html.Br(),
+                                html.Br(),
+                                dcc.RadioItems(id='best_of',
+                                               options={
+                                                   '3': 'Best of 3',
+                                                   '5': 'Best of 5',
+                                               },
+                                               value='Best of 3'
+                                               )
+                            ],
+                                style={
+                                    "margin": "5px",
+                                    "display": "inline-block",
+                                    "padding-top": "5px",
+                                    "padding-bottom": "5px",
+                                    "width": "33%",
+                                }, ),
+
+                        ], className="box"),
+
+                        # -----------------
 
                         # Two charts radar and map. Row 1 of viz
 
@@ -451,7 +540,7 @@ app.layout = html.Div(
                                                 html.Label(id="title_bar"),
                                                 dcc.Graph(id="radar_chart"),
                                                 html.Div(
-                                                    [html.P(id="comment", children='This is a Radar Chart comparing '
+                                                    [html.P(id="comment", children='Radar Chart comparing '
                                                                                    'two selected players on '
                                                                                    'performance metric of ratio of '
                                                                                    'matches won in different '
@@ -474,7 +563,7 @@ app.layout = html.Div(
                                                 html.Label(id="title_bar2"),
                                                 dcc.Graph(id="map_chart"),
                                                 html.Div(
-                                                    [html.P(id="comment2", children="This is a choropleth map showing "
+                                                    [html.P(id="comment2", children="Choropleth map showing "
                                                                                     "the location of countries where "
                                                                                     "the two selected players are "
                                                                                     "from.")],
@@ -504,7 +593,7 @@ app.layout = html.Div(
                                                 html.Label(id="title_bar3"),
                                                 dcc.Graph(id="rank_season"),
                                                 html.Div(
-                                                    [html.P(id="comment3", children='This line graphs shows rank of '
+                                                    [html.P(id="comment3", children='Line graphs shows rank of '
                                                                                     'player 1 and player 2 over '
                                                                                     'seasons, in case of a gap there '
                                                                                     'maybe some abnormal behaviour.')],
@@ -534,7 +623,7 @@ app.layout = html.Div(
                                                 html.Label(id="title_bar4"),
                                                 dcc.Graph(id="title_season"),
                                                 html.Div(
-                                                    [html.P(id="comment4", children='This line graphs shows no of '
+                                                    [html.P(id="comment4", children='Line graphs shows no of '
                                                                                     'titles won by '
                                                                                     'player 1 and player 2 over '
                                                                                     'seasons, in case of a gap there '
