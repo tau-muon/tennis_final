@@ -6,6 +6,7 @@ import sys, os
 import pickle
 
 sys.path.append(os.path.abspath("../"))
+from analytics.FeatEng import DB_PATH
 from analytics.Analyze import Analysis
 
 
@@ -18,7 +19,7 @@ class MLModel(object):
 
     def _prepareModel(self,analysisI):
         #Dummy model for Now
-        model = pickle.load(open('model.pkl', 'rb'))
+        model = pickle.load(open(DB_PATH+'model.pkl', 'rb'))
         # model = DecisionTreeClassifier()
         # df = analysisI.create_data()
         # Y = df['result']
@@ -60,19 +61,6 @@ class MLModel(object):
             return ID1
         else:
             return ID2
-      
-    # def use_decisiontree(self):
-    #     self.model = DecisionTreeClassifier()
-
-    # def use_randomforest(self):
-    #     self.model = 
-
-    def train(self, X, y):
-        self.model.fit(X, y)
-        return
-
-    def predict_proba(self, X):
-        return self.model.predict_proba(X=X)
     
 
 if __name__ == "__main__":

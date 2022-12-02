@@ -17,8 +17,6 @@ if __name__ == "__main__":
         sys.exit("Failed to launch database docker!")
     
     #### Generate the required features
-    ft = FeaturesEngineering()
-    print(ft.get_active_player_table().columns)
 
     #### Analyze and clean
     
