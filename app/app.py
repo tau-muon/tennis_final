@@ -28,7 +28,7 @@ df_radar = df[["name", "matches_win_percentage", "grand_slam_win_percentage", "t
                "outdoor_matches_win_percentage", "indoor_matches_win_percentage"]]
 
 BASE_URL = 'https://api.api-tennis.com/tennis/?'
-API_KEY = "ea60e20b6b5c56a9b7f6102c93047fe6e96610565fb73fb2015be77983c4243a"
+API_KEY = "84818ec2586012d56c6d009790776455e75e6d7f9221ad8ee70d40d2dec185ff"
 method = 'method=get_players'
 
 
@@ -300,9 +300,9 @@ def summ_table(df, standings, id_1, id_2):
     tp1 = df.loc[id_1]['turned_pro']
     tp2 = df.loc[id_2]['turned_pro']
 
-    data = dict(values=[[age1, rank1, h1, w1, tp1], ['Age', "Rank", "Height", "Weight", "Turned Pro"], [age2, rank2, h2, w2, tp2]])
+    data = dict(values=[[int(age1), rank1, h1, w1, tp1], ['Age', "Rank", "Height", "Weight", "Turned Pro"], [int(age2), rank2, h2, w2, tp2]])
 
-    fig = go.Figure(data=[go.Table(header=dict(Values=[ln1, ' ', ln2]), cells=data)])
+    fig = go.Figure(data=[go.Table(header=dict(values=[ln1, ' ', ln2]), cells=data)])
 
     return fig
 
@@ -690,6 +690,33 @@ app.layout = html.Div(
                             className="box",
                         ),
 
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.Div(
+                                            [
+                                                html.Label(id="title_bar7"),
+                                                dcc.Graph(id="summ_table"),
+                                                html.Div(
+                                                    [html.P(id="comment7", children='This table shows general info about the '
+                                                                                    'players')],
+                                                    className="box_comment",
+                                                ),
+                                            ],
+                                            className="box",
+                                            style={"padding-bottom": "15px"},
+                                        ),
+
+                                    ],
+                                    style={"width": "100%", "display": "inline-block"},
+                                ),
+
+                            ],
+                            className="box",
+                        ),
+
+
                         
 
                         html.Div(
@@ -863,6 +890,18 @@ def update_plot(player1, player2):
 def update_plot(player1, player2):
     if player1 != player2:
         fig = rank(df, standings, player1, player2)
+        fig.update_layout(template='gridon')
+        return fig
+    else:
+        raise PreventUpdate
+
+@app.callback(
+    Output(component_id='summ_table', component_property='figure'),
+    [Input(component_id='dropdown_player_1', component_property='value'),
+     Input(component_id='dropdown_player_2', component_property='value')])
+def update_plot(player1, player2):
+    if player1 != player2:
+        fig = summ_table(df, standings, player1, player2)
         fig.update_layout(template='gridon')
         return fig
     else:
