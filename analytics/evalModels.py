@@ -84,7 +84,19 @@ def splitAndScale(X: pd.DataFrame, Y: pd.DatetimeIndex,  test_size:float=0.3, sc
     return(x_train,y_train,x_test,y_test)  
     
 
-def getBestfromGridSearch(classifier, x, y, param, scoringTechnique:str='f1'):
+def getBestfromGridSearch(classifier:object, x:pd.DataFrame, y:pd.DataFrame, param:dict, scoringTechnique:str='f1') -> tuple:
+    """ Apply grid search on the input classifier regarding input parameters
+
+    Args:
+        classifier (object): Input classifier object to apply search accordingly
+        x (pd.DataFrame): X features data
+        y (pd.DataFrame): Y data results 
+        param (dict): Optimization parameters
+        scoringTechnique (str, optional): _description_. Defaults to 'f1'.
+
+    Returns:
+        tuple: object, best parameters: Object of the best model found, the best parameters used for this model
+    """
     clf = GridSearchCV(classifier(), param, cv=10,refit=True,scoring=scoringTechnique)
     clf.fit(x,y)
     return clf.best_estimator_, clf.best_params_
@@ -190,19 +202,10 @@ def doDecisionTree(x_train,y_train,x_test,y_test,score,outPath) -> DecisionTreeC
     print("Columns Names Weight Sorted:", list(x_train.columns[sorted_indices]))
     print("\nBest Parameters:", best_params)
 
-    y_pred = clf.predict(x_test)
-    # print("AccuracyOptimized:",metrics.f1_score(y_test,y_pred))
-
     DecisionClassifier = DecisionTreeClassifier()
     DecisionClassifier.fit(x_train,y_train)
     generateLearningCurve(DecisionClassifier,x_train,y_train,scoringTechnique=score,outPath =outPath,base=True)
-
-    # y_pred = DecisionClassifier.predict(x_test)
-    # print("Accuracy2:",metrics.f1_score(y_test,y_pred))
-
-    y_test_pred = clf.predict(x_test)
-    y_train_pred = clf.predict(x_train)
-    return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_test_pred))
+    return get_score_matrics(model=clf, x_train=x_train, y_train= y_train, x_test=x_test, y_test=y_test)
 
 
 def doAdaBoost(x_train,y_train,x_test,y_test,score,outPath,Dtree= None):
@@ -248,27 +251,17 @@ def doAdaBoost(x_train,y_train,x_test,y_test,score,outPath,Dtree= None):
     generateLearningCurve(BoostClassifer,x_train,y_train,scoringTechnique=score,outPath =outPath,base=True)
     y_pred = BoostClassifer.predict(x_test)
     print("Accuracy2:",metrics.f1_score(y_test,y_pred))
-    y_train_pred = BoostClassifer.predict(x_train)
-
-    y_test_pred = clf.predict(x_test)
-    y_train_pred = clf.predict(x_train)
-    return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_test_pred))
+    
+    return get_score_matrics(model=clf, x_train=x_train, y_train= y_train, x_test=x_test, y_test=y_test)
 
 
 def doKNN(x_train,y_train,x_test,y_test,score,outPath):
-    params = {
-        "n_neighbors": [i for i in range(1,50)],
-        # "weights": ["distance"]
-        
-
-    }
+    params = {"n_neighbors": [i for i in range(1,50)] }
     generateValidationCurve(KNeighborsClassifier,x_train,y_train,'n_neighbors',params["n_neighbors"],scoringTechnique=score,outPath =outPath)
 
     clf, best_params = getBestfromGridSearch(KNeighborsClassifier,x_train,y_train,params,scoringTechnique=score)
-    # clf.fit(x_train,y_train)
 
     print("\nBest Parameters:", best_params)
-
 
     generateLearningCurve(clf,x_train,y_train,scoringTechnique=score,outPath =outPath)
     
@@ -276,28 +269,28 @@ def doKNN(x_train,y_train,x_test,y_test,score,outPath):
 
     print("AccuracyOptimized:",metrics.f1_score(y_test,y_pred))
     knnClassifier = KNeighborsClassifier()
-
     knnClassifier.fit(x_train,y_train)
     generateLearningCurve(knnClassifier,x_train,y_train,scoringTechnique=score,outPath =outPath,base=True)
 
     y_pred = knnClassifier.predict(x_test)
     print("Accuracy2:",metrics.f1_score(y_test,y_pred))
-    y_train_pred = clf.predict(x_train)
-    y_pred = clf.predict(x_test)
 
-    return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
+    return get_score_matrics(model=clf, x_train=x_train, y_train= y_train, x_test=x_test, y_test=y_test)
 
 
-def doNN(x_train,y_train,x_test,y_test,score,outPath):
-    # hiddenLayers= [x for x in itertools.product(range(1,10), range(1,10),range(0,10))]
-    hiddenLayers = [(5),(5,5),(10),(10,10),(10,10,10),(100),(100,5),(100,100),(100,100,100)]
-    parameter_space = {
-    'hidden_layer_sizes': hiddenLayers,
-    'activation': ['tanh', 'relu','logistic'],
-    'alpha': [0.0001, 0.001,0.05],
-    'learning_rate': ['constant','adaptive'],
-    'max_iter': [1000]
-    }
+def doNN(x_train,y_train,x_test,y_test,score,outPath, validationInsights:dict=None):
+
+    if validationInsights == None:
+        validationInsights = {
+        # 'hidden_layer_sizes': [x for x in itertools.product(range(1,10), range(1,10),range(0,10))],
+        'hidden_layer_sizes': [(5),(5,5),(10),(10,10),(10,10,10),(100),(100,5),(100,100),(100,100,100)],
+        'activation': ['tanh', 'relu','logistic'],
+        'alpha': [0.0001, 0.001,0.05],
+        'learning_rate': ['constant','adaptive'],
+        'max_iter': [1000]
+        }
+
+    #### Generate 
     generateValidationCurve(MLPClassifier,x_train,y_train,'hidden_layer_sizes',parameter_space["hidden_layer_sizes"],[a for a in range(len(hiddenLayers))],scoringTechnique=score,outPath=outPath)
     generateValidationCurve(MLPClassifier,x_train,y_train,'activation',parameter_space["activation"],plotRange=parameter_space["activation"],scoringTechnique=score,outPath=outPath)
     generateValidationCurve(MLPClassifier,x_train,y_train,'alpha',parameter_space["alpha"],plotRange=[00.001,0.001,0.05],scoringTechnique=score,outPath=outPath)
@@ -352,19 +345,19 @@ def doNN(x_train,y_train,x_test,y_test,score,outPath):
     y_pred = NNClassifier.predict(x_test)
     # print("Accuracy:",metrics.f1_score(
     # y_test,y_pred))
-    y_train_pred = clf.predict(x_train)
-    y_pred = clf.predict(x_test)
-
-    return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_pred))
+    
+    return get_score_matrics(model=clf, x_train=x_train, y_train= y_train, x_test=x_test, y_test=y_test)
 
 
-def doGradientBoosting(x_train,y_train,x_test,y_test,score,outPath,Dtree= None) -> GradientBoostingClassifier:
-
-    validationInsights =  {
-        "n_estimators" : [4, 16, 256, 512],
-    }
-
-    generateValidationCurve(GradientBoostingClassifier,x_train,y_train,'n_estimators',validationInsights["n_estimators"],classifierParams=Dtree,scoringTechnique=score,outPath =outPath)
+def doGradientBoosting(x_train,y_train,x_test,y_test,score,outPath,Dtree= None, validationInsights:dict=None) -> GradientBoostingClassifier:
+    if validationInsights == None:
+        validationInsights =  {
+            "n_estimators" : [4, 8, 16, 256, 350, 512],
+        }
+    
+    #### Generate validation curves
+    for key, value in validationInsights.items():
+        generateValidationCurve(GradientBoostingClassifier,x_train,y_train,key,value,classifierParams=Dtree,scoringTechnique=score,outPath =outPath)
 
     clf, best_params = getBestfromGridSearch(GradientBoostingClassifier,x_train,y_train,validationInsights,scoringTechnique=score)
     generateLearningCurve(clf,x_train,y_train,scoringTechnique=score,outPath =outPath)
@@ -386,15 +379,8 @@ def doGradientBoosting(x_train,y_train,x_test,y_test,score,outPath,Dtree= None) 
 
     y_pred = BoostClassifer.predict(x_test)
     print("Accuracy2:",metrics.f1_score(y_test,y_pred))
-    y_train_pred = BoostClassifer.predict(x_train)
-
-    y_test_pred = clf.predict(x_test)
-    y_train_pred = clf.predict(x_train)
-
-    # test_accuracy_train = accuracy_score(y_true=y_train, y_pred=y_train_pred)
-    # test_accuracy_test = accuracy_score(y_true=y_test, y_pred=y_test_pred)
-    return(metrics.f1_score(y_train,y_train_pred),metrics.f1_score(y_test,y_test_pred))
-    # return(test_accuracy_train, test_accuracy_test)
+    return get_score_matrics(model=clf, x_train=x_train, y_train= y_train, x_test=x_test, y_test=y_test)
+    
 
 def set_box_color(bp, color):
     plt.setp(bp['boxes'], color=color)
@@ -411,9 +397,9 @@ if __name__ == "__main__":
     analyzeC = Analysis()
     df = analyzeC.create_data()
 
-    CROSS_VALIDATION = False
+    CROSS_VALIDATION = True
 
-    EVAL_MODELS = True
+    EVAL_MODELS = False
 
     EVAL_DECISION_TREE = True
     EVAL_ADA_BOOST = True
@@ -421,37 +407,52 @@ if __name__ == "__main__":
     EVAL_KNN = True
     EVAL_GRADIENT_BOOSTING = True
 
-    #### Evaluate based on half the data for faster computing
+    #### Evaluate based on the data percentage selected for faster computing
     Y = df["result"]
     X = df.drop(columns=["result"])
     # X, Y, _, _ = splitAndScale(X=X ,Y=Y ,test_size=0.5)
-
+    
     columns1 = ['surface', 'best_of', 'indoor', 'elo_rating', 'rank', 'age', 'height', 'surface_win_p', 'indoor_p', 'best_of_win_p', 'matches_won_p', 'backhand']
     columns2 = ['surface', 'best_of', 'indoor', 'elo_rating', 'rank', 'surface_win_p', 'indoor_p', 'best_of_win_p', 'matches_won_p']
     columns3 = ['surface', 'best_of', 'indoor', 'elo_rating', 'rank', 'age', 'height']
 
-    results = pd.DataFrame(columns=["FeatSet1","FeatSet2", "FeatSet3"])
     models = {
-        "DT" : DecisionTreeClassifier(max_depth=2, random_state=SEED),
-        "GradBoost" : GradientBoostingClassifier(n_estimators=256,random_state=SEED),
+        "DT" : DecisionTreeClassifier(max_depth=8, random_state=SEED),
+        "GradBoost" : GradientBoostingClassifier(n_estimators=512,random_state=SEED),
         "NN": MLPClassifier(activation="relu", max_iter=1000, solver="adam",warm_start=True,shuffle=True, random_state=SEED, alpha= 0.001, learning_rate='constant'),
         "AdaBoost": AdaBoostClassifier(n_estimators=256, random_state=SEED),
         "KNN" : KNeighborsClassifier(n_neighbors=6)
         }
+    modelsSearchSpace = {
+        "DT" :  {'max_depth':[2, 8, 16, 32, 48]},
+        "GradBoost" : {"n_estimators" : [4, 16, 48, 256, 350, 512]},
+        "NN" : {
+                # 'hidden_layer_sizes': [(5,5),(10,10),(100,100,100), (1000,100,1000)],
+                # 'hidden_layer_sizes': [(5),(5,5),(10),(10,10),(10,10,10),(100),(100,5),(100,100),(100,100,100)],
+                'activation': ['tanh', 'relu','logistic'],
+                'alpha': [0.001,0.05,0.1],
+                'learning_rate': ['constant','adaptive'],
+                'max_iter': [1000]
+            },
+        "AdaBoost" : {
+                "n_estimators" : [4, 16, 256],
+                'base_estimator' : [DecisionTreeClassifier(max_depth=depth) for depth in [2, 8, 16, 32, 48]]
+            },
+        "KNN" : {"n_neighbors": [i for i in range(1, 100, 5)]}
+    }
     colors = {
-        "FeatSet1" : "lightblue",
-        "FeatSet2" : "pink", 
-        "FeatSet3" : "lightgreen"
+        "FeatSet1" : "blue",
+        "FeatSet2" : "red", 
+        "FeatSet3" : "green"
     }
     kfold = model_selection.KFold(n_splits=10, random_state=SEED, shuffle=True)
     ticks = list(models.keys())
     count = 1
-    handles = []
 
     if CROSS_VALIDATION:
 
         fig = plt.figure()
-        fig.suptitle('Algorithm Comparison')
+        # fig.suptitle('Algorithm Comparison')
         ax = fig.add_subplot(111)
 
         for cols in [columns1, columns2, columns3]:
@@ -464,42 +465,30 @@ if __name__ == "__main__":
             resultDict = dict()
             for modelName, model in models.items():
                 print("Model:", modelName)
-                cv_results = model_selection.cross_val_score(model, X[cols], Y, cv=kfold, scoring="accuracy")
-                resultDict[modelName] = cv_results
-            results[label] = resultDict
+                resultDict[modelName] = model_selection.cross_val_score(model, X[cols], Y, cv=kfold, scoring="accuracy")
 
             data = list(resultDict.values())
-            print(label, data)
+            print(label, resultDict)
             
             featSetBplt = plt.boxplot(data,  positions=np.array(range(len(data)))*3.0+count*0.6, patch_artist=True, labels=ticks)
             set_box_color(featSetBplt, colors[label])
-            handles.append(featSetBplt)
             count += 1
-            # del x_train
-            # del y_train
-            # del x_test
-            # del y_test
-
-        # results.boxplot()
         
-        # ax.set_xticklabels(list(models.keys()))
-        # ax.set_xticks()
-        # plt.show()
-
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
         plt.xticks(range(1, len(ticks) * 3, 3), ticks)
         plt.legend(list(colors.keys()), loc="center right", bbox_to_anchor=(1.4, 0.5),   fancybox=True)
         leg = ax.get_legend()
-        hl_dict = {handle.get_label(): handle for handle in leg.legendHandles}
+        
         for handleIndex, handle in enumerate(leg.legendHandles):
             handle.set_color(colors["FeatSet"+str(handleIndex+1)])
 
         plt.grid(True)
-        plt.savefig("./Images/EvalModels_CV_FeatSets") 
+        plt.savefig("./Images/EvalModels_CV_FeatSets.jpg", format='jpg', dpi=150)
 
-    else:
-        x_train,y_train,x_test,y_test = splitAndScale(X,Y) 
+
+    #### Split the data to training and testing data    
+    x_train,y_train,x_test,y_test = splitAndScale(X,Y)
 
     if EVAL_MODELS:
         #### Evaluating the models best parameters
@@ -507,93 +496,54 @@ if __name__ == "__main__":
         fp.write("ML Model, Train Accuracy, Test Accuracy, Best Optimization Parameters\n")
 
         if EVAL_DECISION_TREE:
+            #### Model grid search
             print("\nRunning Decision Tree:")
-
-            validationInsights =  {
-                'max_depth':[2, 8, 16, 32, 48],
-            }
-            clf, best_params = getBestfromGridSearch(DecisionTreeClassifier,x_train,y_train,validationInsights,scoringTechnique="f1")
-            best_params = str(best_params)
+            clf, best_params = getBestfromGridSearch(DecisionTreeClassifier,x_train,y_train,modelsSearchSpace["DT"],scoringTechnique="f1")
             train_score, test_score = get_score_matrics(clf, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
-            fp.write("Decision Tree,"+str(train_score)+","+str(test_score)+","+best_params+"\n")
+            fp.write("Decision Tree,"+str(train_score)+","+str(test_score)+","+str(best_params)+"\n")
 
-            train_score, test_score = doDecisionTree(x_train,y_train,x_test,y_test,"f1","./Images/")
-            # train_score = round_value(train_score)
-            # test_score = round_value(test_score)
-            # print("Train Score:", train_score)
-            # print("Test Score:", test_score)
+            #### Create the learning/validation curves
+            doDecisionTree(x_train,y_train,x_test,y_test,"f1","./Images/")
 
         if EVAL_GRADIENT_BOOSTING:
+            #### Model grid search
             print("\nRunning Gradient Boosting")
-            validationInsights =  {
-                "n_estimators" : [4, 16, 48, 256, 512],
-            }
-            clf, best_params = getBestfromGridSearch(GradientBoostingClassifier,x_train,y_train,validationInsights,scoringTechnique="f1")
-            best_params = str(best_params)
+            clf, best_params = getBestfromGridSearch(GradientBoostingClassifier,x_train,y_train,modelsSearchSpace["GradBoost"],scoringTechnique="f1")
             train_score, test_score = get_score_matrics(clf, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
-            fp.write("Gradient Boosting,"+str(train_score)+","+str(test_score)+","+best_params+"\n")
+            fp.write("Gradient Boosting,"+str(train_score)+","+str(test_score)+","+str(best_params)+"\n")
             
-            train_score, test_score = doGradientBoosting(x_train,y_train,x_test,y_test,"f1","./Images/")
-            # train_score, test_score = round_value(train_score), round_value(test_score)
-            # print("Train Score:", train_score)
-            # print("Test Score:", test_score)
+            #### Create the learning/validation curves
+            doGradientBoosting(x_train,y_train,x_test,y_test,"f1","./Images/")
 
         if EVAL_NN:
+            #### Model grid search
             print("\nRunning NN")
-            # hiddenLayers = [(5),(5,5),(10),(10,10),(10,10,10),(100),(100,5),(100,100),(100,100,100)]
-            hiddenLayers = [(5,5),(10,10),(100,100,100), (1000,100,1000)]
-            validationInsights = {
-                # 'hidden_layer_sizes': hiddenLayers,
-                'activation': ['tanh', 'relu','logistic'],
-                'alpha': [0.001,0.05,0.1],
-                'learning_rate': ['constant','adaptive'],
-                'max_iter': [1000]
-            }
-            clf, best_params = getBestfromGridSearch(MLPClassifier,x_train,y_train,validationInsights,scoringTechnique="f1")
-            best_params = str(best_params)
+            clf, best_params = getBestfromGridSearch(MLPClassifier,x_train,y_train,modelsSearchSpace["NN"],scoringTechnique="f1")
             train_score, test_score = get_score_matrics(clf, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
-            fp.write("NN,"+str(train_score)+","+str(test_score)+","+best_params+"\n")
+            fp.write("NN,"+str(train_score)+","+str(test_score)+","+str(best_params)+"\n")
 
-            train_score, test_score = doNN(x_train,y_train,x_test,y_test,"f1","./Images/")
-            # train_score = round(train_score, 6)
-            # test_score = round(test_score, 6)
-            # print("Train Score:", train_score)
-            # print("Test Score:", test_score)
+            #### Create the learning/validation curves
+            doNN(x_train,y_train,x_test,y_test,"f1","./Images/")
 
         if EVAL_ADA_BOOST:
-            print("\nRunning Ada Boost:")
-            max_depths = [2, 8, 16, 32]
-            dtClassifiers2=[]
-            for depth in max_depths: dtClassifiers2.append(DecisionTreeClassifier(max_depth=depth))
-            validationInsights =  {
-                "n_estimators" : [4, 16, 256],
-                'base_estimator' : dtClassifiers2
-            }
-            clf, best_params = getBestfromGridSearch(AdaBoostClassifier,x_train,y_train,validationInsights,scoringTechnique="f1")
-            best_params = str(best_params)
+            #### Model grid search
+            print("\nRunning Ada Boost")
+            clf, best_params = getBestfromGridSearch(AdaBoostClassifier,x_train,y_train,modelsSearchSpace["AdaBoost"],scoringTechnique="f1")
             train_score, test_score = get_score_matrics(clf, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
-            fp.write("Ada Boost,"+str(train_score)+","+str(test_score)+","+best_params+"\n")
+            fp.write("Ada Boost,"+str(train_score)+","+str(test_score)+","+str(best_params)+"\n")
 
-            train_score, test_score = doAdaBoost(x_train,y_train,x_test,y_test,"f1","./Images/")
-            # train_score = round(train_score, 6)
-            # test_score = round(test_score, 6)
-            # print("Train Score:", train_score)
-            # print("Test Score:", test_score)
-
+            #### Create the learning/validation curves
+            doAdaBoost(x_train,y_train,x_test,y_test,"f1","./Images/")
+            
         if EVAL_KNN:
-            print("\nRunning kNN:")
-            validationInsights = {
-                "n_neighbors": [i for i in range(1,100, 5)],
-            }
-            clf, best_params = getBestfromGridSearch(KNeighborsClassifier,x_train,y_train,validationInsights,scoringTechnique="f1")
+            #### Model grid search
+            print("\nRunning kNN")
+            clf, best_params = getBestfromGridSearch(KNeighborsClassifier,x_train,y_train,modelsSearchSpace["KNN"],scoringTechnique="f1")
             best_params = str(best_params)
             train_score, test_score = get_score_matrics(clf, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
             fp.write("KNN,"+str(train_score)+","+str(test_score)+","+best_params+"\n")
 
-            train_score, test_score = doKNN(x_train,y_train,x_test,y_test,"f1","./Images/")
-            # train_score = round(train_score, 6)
-            # test_score = round(test_score, 6)
-            # print("Train Score:", train_score)
-            # print("Test Score:", test_score)
+            #### Create the learning/validation curves
+            doKNN(x_train,y_train,x_test,y_test,"f1","./Images/")
 
         fp.close()
