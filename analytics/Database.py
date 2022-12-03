@@ -2,6 +2,9 @@ import psycopg2
 from pandas import DataFrame
 import pandas.io.sql as psql
 
+RUN_LOCALLY = True
+DB_PATH = "./db/"
+
 
 class Database(object):
     def __new__(cls, *args, **kwargs):
@@ -31,3 +34,6 @@ class Database(object):
         self.cursor.close()
         self.connection.close()
         return
+
+
+        

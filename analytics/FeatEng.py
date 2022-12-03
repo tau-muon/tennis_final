@@ -6,20 +6,29 @@ sys.path.append(os.path.abspath("../"))
 
 from analytics.Database import Database
 
+READ_LOCALLY = False
+DB_PATH = "./db/"
 
 class FeaturesEngineering(object):
-    def __init__(self) -> None:
-        self.db = Database()
-        # Player data
-        self.player_df = self.get_active_player_table()
-        self.player_performance_df = self.get_player_performance_table()
-        self.player_stats_df = self.get_player_stats_table()
-        self.player_h2h_df = self.get_player_h2h_table()
+    def __init__(self,mode="eval") -> None:
+        if not READ_LOCALLY:
+            self.db = Database()
+            # Player data
+            self.player_df = self.get_active_player_table()
+            self.player_performance_df = self.get_player_performance_table()
 
-        # Match data
-        self.match_df = self.get_match_table()
-        self.tournament_df = self.get_tournament_table()
-        
+            # Match data
+            self.match_df = self.get_match_table()
+
+            self.match_df.to_csv(DB_PATH+"match_data.csv", index=False)
+            self.player_performance_df.to_csv(DB_PATH+"player_performance_data.csv", index=False)
+            self.player_df.to_csv(DB_PATH+"player_data.csv", index=False)
+
+        else:
+            self.player_performance_df = pd.read_csv(DB_PATH+"player_performance_data.csv")
+            self.match_df = pd.read_csv(DB_PATH+"match_data.csv")
+            self.player_df = pd.read_csv(DB_PATH+"player_data.csv")
+            
 
     def get_active_player_table(self) -> pd.DataFrame:
         """ Extract the player table with needed columns and players being active
@@ -92,4 +101,6 @@ if __name__ == "__main__":
         print(output.stdout.decode("utf-8"))
         sys.exit("Failed to launch database docker!")
     feat = FeaturesEngineering()
-
+    feat.match_df.to_csv("match_data.csv", index=False)
+    feat.player_performance_df.to_csv("player_performance_data.csv", index=False)
+    feat.player_df.to_csv("player_data.csv", index=False)
