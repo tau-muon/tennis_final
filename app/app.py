@@ -313,8 +313,8 @@ def summ_table(df, standings, id_1, id_2):
     return fig
 
 def pred_winner(p1_id, p2_id, surface, bestof, indoor):
-    #winnerID = model.predict(p1_id,p2_id,surface,bestof,indoor)
-    winnerID = 4742
+    winnerID = model.predict(p1_id,p2_id,surface,bestof,indoor)
+    #winnerID = 4742
     winnerLn = df.loc[winnerID]['last_name']
 
     fig = go.Figure()
@@ -329,7 +329,7 @@ def pred_winner(p1_id, p2_id, surface, bestof, indoor):
         text=f"Winner: {winnerLn}",
         showarrow=False,
         font={'size': 60, 'color': 'black'})
-        
+
     return fig
 
 # ------------------------------------------------------ APP ------------------------------------------------------
