@@ -72,10 +72,11 @@ class MLModel(object):
             best_of_win_p = player1Data["best_of_5_matches_won_p"].iloc[0] / player2Data["best_of_5_matches_won_p"].iloc[0]
 
         #### Calculate the overall winning percentage
+        print(player1Data["matches_won_p"].iloc[0])
         matches_win_p =  player1Data["matches_won_p"].iloc[0] / player2Data["matches_won_p"].iloc[0]
 
         #### Calculate backhand winning percentage
-        backhand_matches_win_p = player1Data["backhand"].iloc[0] / player2Data["backhand"].iloc[0]
+        backhand_matches_win_p = int(player1Data["backhand"].iloc[0]) / int(player2Data["backhand"].iloc[0])
 
         age = player1Data['age'].iloc[0] /player2Data['age'].iloc[0]
         rank = player1Data['current_rank'].iloc[0] / player2Data['current_rank'].iloc[0]

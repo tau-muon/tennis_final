@@ -38,7 +38,7 @@ method = 'method=get_players'
 
 
 standings = pd.DataFrame(get_standings(API_KEY))[["player", "place", "points", 'player_key']]
-#model = MLModel()
+model = MLModel()
 # country_code = dict(df["country_id"])
 
 
@@ -495,12 +495,11 @@ app.layout = html.Div(
                                 html.Br(),
                                 html.Br(),
                                 dcc.RadioItems(id='surface_type',
-                                               options={
-                                                   'G': 'Grass',
-                                                   'C': 'Clay',
-                                                   'H': 'Hard'
-                                               },
-                                               value='Grass'
+                                               options=[
+                                                {'label':'Grass', 'value':'G'},
+                                                {'label':'Clay', 'value':'C'},
+                                                {'label':'Hard', 'value':'H'}],
+                                               value='G'
                                                )
                             ],
                                 style={
@@ -508,7 +507,7 @@ app.layout = html.Div(
                                     "display": "inline-block",
                                     "padding-top": "5px",
                                     "padding-bottom": "5px",
-                                    "width": "33%",
+                                    "width": "25%",
                                 }, ),
 
                             html.Div([
@@ -516,11 +515,10 @@ app.layout = html.Div(
                                 html.Br(),
                                 html.Br(),
                                 dcc.RadioItems(id='in_out',
-                                               options={
-                                                   1: 'Indoor',
-                                                   0: 'Outdoor',
-                                               },
-                                               value='Indoor'
+                                               options=[
+                                                {'label':'Indoor', 'value': 1},
+                                                {'label':'Outdoor', 'value':0}],
+                                               value=1
                                                )
                             ],
                                 style={
@@ -528,7 +526,7 @@ app.layout = html.Div(
                                     "display": "inline-block",
                                     "padding-top": "5px",
                                     "padding-bottom": "5px",
-                                    "width": "30%",
+                                    "width": "25%",
                                 }, ),
 
                             html.Div([
@@ -536,11 +534,11 @@ app.layout = html.Div(
                                 html.Br(),
                                 html.Br(),
                                 dcc.RadioItems(id='best_of',
-                                               options={
-                                                   '3': 'Best of 3',
-                                                   '5': 'Best of 5',
-                                               },
-                                               value='Best of 3'
+                                               options=[
+                                                   {'label':'Best of 3', 'value':3},
+                                                   {'label':'Best of 5', 'value':5}
+                                               ],
+                                               value=3
                                                )
                             ],
                                 style={
@@ -548,7 +546,7 @@ app.layout = html.Div(
                                     "display": "inline-block",
                                     "padding-top": "5px",
                                     "padding-bottom": "5px",
-                                    "width": "33%",
+                                    "width": "25%",
                                 }, ),
 
                         ], className="box"),
@@ -900,9 +898,9 @@ def update_plot(player1, player2):
      Input(component_id='best_of', component_property='value'),
      Input(component_id='in_out', component_property='value')
      ])
-def update_plot(player1, player2, surface, best_of, in_out):
+def update_plot(player1, player2, surface_type, best_of, in_out):
     if player1 != player2:
-        fig = pred_winner(player1, player2, surface, best_of, in_out)
+        fig = pred_winner(player1, player2, surface_type, best_of, in_out)
         fig.update_layout(template='gridon')
         return fig
     else:
