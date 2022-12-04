@@ -1,4 +1,11 @@
-dash == 2.6.0
-pandas
 gunicorn
 dash
+dash-core-components
+dash-html-components
+dash_renderer
+dash-daq
+dash-bootstrap-components
+numpy
+pandas
+plotly
+requests
