@@ -158,7 +158,7 @@ class Analysis(object):
         playerData_df = pd.merge(self.fe.player_df, df, left_on="player_id", right_on="player_id")
 
         playerData_df = playerData_df[playerData_df["active"] == True]
-        playerData_df = playerData_df[playerData_df["backhand"].notna()]
+        playerData_df["backhand"] = playerData_df["backhand"].replace(np.nan, 2)
         playerData_df["backhand"] = playerData_df["backhand"].apply(pd.to_numeric)
 
         # playerData_df.to_csv("./db/all_player_data.csv", index=False)
