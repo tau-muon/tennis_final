@@ -333,7 +333,7 @@ def pred_winner(p1_id, p2_id, surface, bestof, indoor):
 
 # ------------------------------------------------------ APP ------------------------------------------------------
 
-app = dash.Dash(__name__, prevent_initial_callbacks=False)
+app = dash.Dash(__name__)
 server = app.server
 
 # App Layout (HTML)
