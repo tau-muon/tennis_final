@@ -329,6 +329,7 @@ def pred_winner(p1_id, p2_id, surface, bestof, indoor):
         text=f"Winner: {winnerLn}",
         showarrow=False,
         font={'size': 60, 'color': 'black'})
+        
     return fig
 
 # ------------------------------------------------------ APP ------------------------------------------------------
