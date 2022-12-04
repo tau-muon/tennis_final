@@ -314,7 +314,6 @@ def summ_table(df, standings, id_1, id_2):
 
 def pred_winner(p1_id, p2_id, surface, bestof, indoor):
     winnerID = model.predict(p1_id,p2_id,surface,bestof,indoor)
-    #winnerID = 4742
     winnerLn = df.loc[winnerID]['last_name']
 
     fig = go.Figure()
@@ -379,7 +378,7 @@ app.layout = html.Div(
                                 dcc.Dropdown(
                                     id='dropdown_player_1',
                                     options=[{'label': i, 'value': j} for i, j in dict(zip(df.name, df.index)).items()],
-                                    value=26006),
+                                    value=4742),
                             ],
 
                                 style={
@@ -552,6 +551,33 @@ app.layout = html.Div(
                         ], className="box"),
 
                         # -----------------
+                        #Row 5, Predicted Winner
+
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.Div(
+                                            [
+                                                html.Label(id="title_bar8"),
+                                                dcc.Graph(id="pred_winner"),
+                                                html.Div(
+                                                    [html.P(id="comment8", children='This indicator shows the predicted winner '
+                                                                                    'using our ML model')],
+                                                    className="box_comment",
+                                                ),
+                                            ],
+                                            className="box",
+                                            style={"padding-bottom": "15px"},
+                                        ),
+
+                                    ],
+                                    style={"width": "100%", "display": "inline-block"},
+                                ),
+
+                            ],
+                            className="box",
+                        ),
 
                         # Two charts radar and map. Row 1 of viz
 
@@ -694,36 +720,6 @@ app.layout = html.Div(
                             ],
                             className="box",
                         ),
-
-                        #Row 5, Predicted Winner
-
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.Div(
-                                            [
-                                                html.Label(id="title_bar8"),
-                                                dcc.Graph(id="pred_winner"),
-                                                html.Div(
-                                                    [html.P(id="comment8", children='This indicator shows the predicted winner '
-                                                                                    'using our ML model')],
-                                                    className="box_comment",
-                                                ),
-                                            ],
-                                            className="box",
-                                            style={"padding-bottom": "15px"},
-                                        ),
-
-                                    ],
-                                    style={"width": "100%", "display": "inline-block"},
-                                ),
-
-                            ],
-                            className="box",
-                        ),
-
-
                         
 
                         html.Div(
