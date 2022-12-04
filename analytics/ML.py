@@ -82,10 +82,13 @@ class MLModel(object):
         height = player1Data['height'].iloc[0] / player2Data['height'].iloc[0]
         elo = player1Data['current_elo_rating'].iloc[0] / player2Data['current_elo_rating'].iloc[0]
         if pd.isna(elo):
-            elo = 0
+            elo = 1
         if pd.isna(rank):
-            rank = 0
-
+            rank = 1
+        if pd.isna(age):
+            age =1
+        if pd.isna(height):
+            height = 1
         df.loc[len(df.index)] = [Surface,bestOf,indoor,elo,rank,age,height,surface_win_p,indoor_p, best_of_win_p, matches_win_p, backhand_matches_win_p]
         newVals = {
             "H":0,
