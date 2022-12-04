@@ -22,12 +22,13 @@ class FeaturesEngineering(object):
 
             self.match_df.to_csv(DB_PATH+"match_data.csv", index=False)
             self.player_performance_df.to_csv(DB_PATH+"player_performance_data.csv", index=False)
-            self.player_df.to_csv(DB_PATH+"player_data.csv", index=False)
+            self.player_df.to_csv(DB_PATH+"player_data.csv", index=False, date_format='%d')
 
         else:
             self.player_performance_df = pd.read_csv(DB_PATH+"player_performance_data.csv")
             self.match_df = pd.read_csv(DB_PATH+"match_data.csv")
             self.player_df = pd.read_csv(DB_PATH+"player_data.csv")
+            self.player_df["age"] = self.player_df["age"].map(lambda x: pd.to_timedelta(x))
             
 
     def get_active_player_table(self) -> pd.DataFrame:
