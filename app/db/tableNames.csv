@@ -1,0 +1,320 @@
+,table_catalog,table_schema,table_name,table_type
+0,tcb,tcb,grand_slam_goat_points,BASE TABLE
+1,tcb,tcb,best_elo_rating_goat_points,BASE TABLE
+2,tcb,tcb,best_in_match_elo_rating_goat_points,BASE TABLE
+3,tcb,tcb,best_indoor_elo_rating_goat_points,BASE TABLE
+4,tcb,tcb,best_rank_goat_points,BASE TABLE
+5,tcb,tcb,best_season_goat_points,BASE TABLE
+6,tcb,tcb,best_surface_elo_rating_goat_points,BASE TABLE
+7,tcb,tcb,big_win_match_factor,BASE TABLE
+8,tcb,tcb,big_win_rank_factor,BASE TABLE
+9,tcb,tcb,match_stats,BASE TABLE
+10,tcb,tcb,featured_content,BASE TABLE
+11,tcb,tcb,tournament_event_rank_factor,BASE TABLE
+12,tcb,tcb,tournament_event,BASE TABLE
+13,tcb,tcb,event_stats_v,VIEW
+14,tcb,pg_catalog,pg_type,BASE TABLE
+15,tcb,tcb,event_participation_v,VIEW
+16,tcb,tcb,player_season_surface_stats_v,VIEW
+17,tcb,tcb,match_for_stats_v,VIEW
+18,tcb,tcb,match,BASE TABLE
+19,tcb,tcb,player_match_stats_v,VIEW
+20,tcb,tcb,player_season_stats_v,VIEW
+21,tcb,tcb,greatest_rivalries_goat_points,BASE TABLE
+22,tcb,tcb,h2h_rank_factor,BASE TABLE
+23,tcb,tcb,active_player_record,BASE TABLE
+24,tcb,tcb,in_progress_match_stats,BASE TABLE
+25,tcb,tcb,in_progress_event,BASE TABLE
+26,tcb,tcb,player,BASE TABLE
+27,tcb,tcb,in_progress_event_participation_v,VIEW
+28,tcb,pg_catalog,pg_foreign_table,BASE TABLE
+29,tcb,tcb,in_progress_match_for_stats_v,VIEW
+30,tcb,tcb,match_for_rivalry_v,VIEW
+31,tcb,tcb,in_progress_match,BASE TABLE
+32,tcb,tcb,player_ranking,BASE TABLE
+33,tcb,tcb,performance_goat_points,BASE TABLE
+34,tcb,tcb,match_price_v,VIEW
+35,tcb,tcb,player_best_rank_v,VIEW
+36,tcb,tcb,no1_player_ranking_v,VIEW
+37,tcb,tcb,match_price,BASE TABLE
+38,tcb,tcb,performance_category,BASE TABLE
+39,tcb,pg_catalog,pg_roles,VIEW
+40,tcb,tcb,player_best_of_win_streak_v,VIEW
+41,tcb,tcb,tournament_rank_points,BASE TABLE
+42,tcb,tcb,weeks_at_elo_topn_goat_points,BASE TABLE
+43,tcb,tcb,weeks_at_no1_goat_points,BASE TABLE
+44,tcb,pg_catalog,pg_settings,VIEW
+45,tcb,tcb,player_best_elo_rank_v,VIEW
+46,tcb,tcb,player_season_weeks_at_elo_topn_v,VIEW
+47,tcb,tcb,player_best_elo_rating_v,VIEW
+48,tcb,tcb,player_tournament_event_result_v,VIEW
+49,tcb,tcb,player_best_elo_rating_goat_points_date_v,VIEW
+50,tcb,tcb,player_best_rank_points_v,VIEW
+51,tcb,tcb,player_best_elo_rating_goat_points_v,VIEW
+52,tcb,tcb,player_match_for_stats_v,VIEW
+53,tcb,tcb,player_alias,BASE TABLE
+54,tcb,tcb,player_big_wins_v,VIEW
+55,tcb,tcb,player_season_big_wins_goat_points_v,VIEW
+56,tcb,tcb,year_end_rank_goat_points,BASE TABLE
+57,tcb,tcb,player_season_weeks_at_elo_topn_goat_points_v,VIEW
+58,tcb,tcb,player_season_grand_slam_goat_points_v,VIEW
+59,tcb,tcb,topn_player_elo_ranking_v,VIEW
+60,tcb,tcb,player_elo_ranking,BASE TABLE
+61,tcb,tcb,player_season_weeks_at_no1_v,VIEW
+62,tcb,tcb,player_season_weeks_at_no1_goat_points_v,VIEW
+63,tcb,tcb,player_year_end_rank_v,VIEW
+64,tcb,tcb,player_season_goat_points_v,VIEW
+65,tcb,pg_catalog,pg_available_extension_versions,VIEW
+66,tcb,tcb,player_best_season_v,VIEW
+67,tcb,tcb,player_best_season_goat_points_v,VIEW
+68,tcb,tcb,player_best_surface_elo_rating_goat_points_v,VIEW
+69,tcb,pg_catalog,pg_stat_xact_user_functions,VIEW
+70,tcb,pg_catalog,pg_subscription,BASE TABLE
+71,tcb,pg_catalog,pg_attribute,BASE TABLE
+72,tcb,pg_catalog,pg_proc,BASE TABLE
+73,tcb,pg_catalog,pg_class,BASE TABLE
+74,tcb,pg_catalog,pg_attrdef,BASE TABLE
+75,tcb,pg_catalog,pg_constraint,BASE TABLE
+76,tcb,pg_catalog,pg_inherits,BASE TABLE
+77,tcb,pg_catalog,pg_index,BASE TABLE
+78,tcb,pg_catalog,pg_operator,BASE TABLE
+79,tcb,pg_catalog,pg_opfamily,BASE TABLE
+80,tcb,pg_catalog,pg_opclass,BASE TABLE
+81,tcb,pg_catalog,pg_am,BASE TABLE
+82,tcb,pg_catalog,pg_amop,BASE TABLE
+83,tcb,pg_catalog,pg_amproc,BASE TABLE
+84,tcb,pg_catalog,pg_language,BASE TABLE
+85,tcb,pg_catalog,pg_stat_archiver,VIEW
+86,tcb,pg_catalog,pg_stat_bgwriter,VIEW
+87,tcb,pg_catalog,pg_stat_wal,VIEW
+88,tcb,pg_catalog,pg_stat_progress_analyze,VIEW
+89,tcb,pg_catalog,pg_stat_progress_vacuum,VIEW
+90,tcb,pg_catalog,pg_stat_progress_cluster,VIEW
+91,tcb,pg_catalog,pg_stat_progress_create_index,VIEW
+92,tcb,pg_catalog,pg_stat_progress_basebackup,VIEW
+93,tcb,pg_catalog,pg_stat_progress_copy,VIEW
+94,tcb,tcb,player_big_wins_goat_points_v,VIEW
+95,tcb,tcb,player_career_grand_slam_goat_points_v,VIEW
+96,tcb,tcb,player_consecutive_grand_slam_on_same_event_goat_points_v,VIEW
+97,tcb,tcb,player_current_elo_rank_v,VIEW
+98,tcb,pg_catalog,pg_largeobject_metadata,BASE TABLE
+99,tcb,pg_catalog,pg_aggregate,BASE TABLE
+100,tcb,pg_catalog,pg_statistic_ext,BASE TABLE
+101,tcb,pg_catalog,pg_rewrite,BASE TABLE
+102,tcb,pg_catalog,pg_trigger,BASE TABLE
+103,tcb,pg_catalog,pg_event_trigger,BASE TABLE
+104,tcb,pg_catalog,pg_description,BASE TABLE
+105,tcb,pg_catalog,pg_cast,BASE TABLE
+106,tcb,pg_catalog,pg_enum,BASE TABLE
+107,tcb,pg_catalog,pg_namespace,BASE TABLE
+108,tcb,pg_catalog,pg_conversion,BASE TABLE
+109,tcb,pg_catalog,pg_depend,BASE TABLE
+110,tcb,pg_catalog,pg_database,BASE TABLE
+111,tcb,pg_catalog,pg_db_role_setting,BASE TABLE
+112,tcb,pg_catalog,pg_tablespace,BASE TABLE
+113,tcb,pg_catalog,pg_auth_members,BASE TABLE
+114,tcb,pg_catalog,pg_shdepend,BASE TABLE
+115,tcb,pg_catalog,pg_shdescription,BASE TABLE
+116,tcb,pg_catalog,pg_ts_config,BASE TABLE
+117,tcb,pg_catalog,pg_ts_config_map,BASE TABLE
+118,tcb,pg_catalog,pg_ts_dict,BASE TABLE
+119,tcb,pg_catalog,pg_ts_parser,BASE TABLE
+120,tcb,pg_catalog,pg_ts_template,BASE TABLE
+121,tcb,pg_catalog,pg_extension,BASE TABLE
+122,tcb,pg_catalog,pg_foreign_data_wrapper,BASE TABLE
+123,tcb,pg_catalog,pg_foreign_server,BASE TABLE
+124,tcb,pg_catalog,pg_policy,BASE TABLE
+125,tcb,pg_catalog,pg_replication_origin,BASE TABLE
+126,tcb,pg_catalog,pg_default_acl,BASE TABLE
+127,tcb,pg_catalog,pg_init_privs,BASE TABLE
+128,tcb,pg_catalog,pg_seclabel,BASE TABLE
+129,tcb,pg_catalog,pg_shseclabel,BASE TABLE
+130,tcb,pg_catalog,pg_collation,BASE TABLE
+131,tcb,pg_catalog,pg_partitioned_table,BASE TABLE
+132,tcb,pg_catalog,pg_range,BASE TABLE
+133,tcb,pg_catalog,pg_transform,BASE TABLE
+134,tcb,pg_catalog,pg_sequence,BASE TABLE
+135,tcb,pg_catalog,pg_publication,BASE TABLE
+136,tcb,pg_catalog,pg_publication_rel,BASE TABLE
+137,tcb,pg_catalog,pg_subscription_rel,BASE TABLE
+138,tcb,pg_catalog,pg_matviews,VIEW
+139,tcb,pg_catalog,pg_group,VIEW
+140,tcb,pg_catalog,pg_user,VIEW
+141,tcb,pg_catalog,pg_policies,VIEW
+142,tcb,pg_catalog,pg_rules,VIEW
+143,tcb,pg_catalog,pg_views,VIEW
+144,tcb,pg_catalog,pg_tables,VIEW
+145,tcb,pg_catalog,pg_indexes,VIEW
+146,tcb,pg_catalog,pg_sequences,VIEW
+147,tcb,pg_catalog,pg_stats,VIEW
+148,tcb,pg_catalog,pg_stats_ext,VIEW
+149,tcb,pg_catalog,pg_stats_ext_exprs,VIEW
+150,tcb,pg_catalog,pg_publication_tables,VIEW
+151,tcb,pg_catalog,pg_locks,VIEW
+152,tcb,pg_catalog,pg_cursors,VIEW
+153,tcb,pg_catalog,pg_available_extensions,VIEW
+154,tcb,pg_catalog,pg_prepared_xacts,VIEW
+155,tcb,pg_catalog,pg_prepared_statements,VIEW
+156,tcb,pg_catalog,pg_seclabels,VIEW
+157,tcb,pg_catalog,pg_stat_xact_user_tables,VIEW
+158,tcb,pg_catalog,pg_timezone_abbrevs,VIEW
+159,tcb,pg_catalog,pg_timezone_names,VIEW
+160,tcb,pg_catalog,pg_statio_all_tables,VIEW
+161,tcb,pg_catalog,pg_statio_sys_tables,VIEW
+162,tcb,pg_catalog,pg_stat_all_tables,VIEW
+163,tcb,pg_catalog,pg_stat_xact_all_tables,VIEW
+164,tcb,pg_catalog,pg_stat_sys_tables,VIEW
+165,tcb,pg_catalog,pg_stat_xact_sys_tables,VIEW
+166,tcb,pg_catalog,pg_stat_user_tables,VIEW
+167,tcb,pg_catalog,pg_statio_user_tables,VIEW
+168,tcb,pg_catalog,pg_stat_all_indexes,VIEW
+169,tcb,pg_catalog,pg_stat_sys_indexes,VIEW
+170,tcb,pg_catalog,pg_stat_user_indexes,VIEW
+171,tcb,pg_catalog,pg_statio_all_indexes,VIEW
+172,tcb,pg_catalog,pg_statio_sys_indexes,VIEW
+173,tcb,pg_catalog,pg_statio_user_indexes,VIEW
+174,tcb,pg_catalog,pg_statio_all_sequences,VIEW
+175,tcb,pg_catalog,pg_statio_sys_sequences,VIEW
+176,tcb,pg_catalog,pg_statio_user_sequences,VIEW
+177,tcb,pg_catalog,pg_stat_activity,VIEW
+178,tcb,pg_catalog,pg_stat_replication,VIEW
+179,tcb,pg_catalog,pg_stat_slru,VIEW
+180,tcb,pg_catalog,pg_stat_wal_receiver,VIEW
+181,tcb,pg_catalog,pg_stat_subscription,VIEW
+182,tcb,pg_catalog,pg_stat_ssl,VIEW
+183,tcb,pg_catalog,pg_stat_gssapi,VIEW
+184,tcb,pg_catalog,pg_replication_slots,VIEW
+185,tcb,pg_catalog,pg_stat_replication_slots,VIEW
+186,tcb,pg_catalog,pg_stat_database,VIEW
+187,tcb,pg_catalog,pg_stat_database_conflicts,VIEW
+188,tcb,pg_catalog,pg_stat_user_functions,VIEW
+189,tcb,pg_catalog,pg_user_mappings,VIEW
+190,tcb,information_schema,information_schema_catalog_name,VIEW
+191,tcb,information_schema,attributes,VIEW
+192,tcb,information_schema,applicable_roles,VIEW
+193,tcb,information_schema,administrable_role_authorizations,VIEW
+194,tcb,information_schema,check_constraint_routine_usage,VIEW
+195,tcb,information_schema,character_sets,VIEW
+196,tcb,information_schema,check_constraints,VIEW
+197,tcb,information_schema,collations,VIEW
+198,tcb,information_schema,collation_character_set_applicability,VIEW
+199,tcb,information_schema,column_column_usage,VIEW
+200,tcb,tcb,player_current_rank_v,VIEW
+201,tcb,information_schema,column_domain_usage,VIEW
+202,tcb,information_schema,routines,VIEW
+203,tcb,information_schema,column_privileges,VIEW
+204,tcb,information_schema,role_column_grants,VIEW
+205,tcb,information_schema,column_udt_usage,VIEW
+206,tcb,information_schema,columns,VIEW
+207,tcb,information_schema,constraint_column_usage,VIEW
+208,tcb,information_schema,routine_column_usage,VIEW
+209,tcb,information_schema,constraint_table_usage,VIEW
+210,tcb,information_schema,domain_constraints,VIEW
+211,tcb,information_schema,domain_udt_usage,VIEW
+212,tcb,information_schema,routine_privileges,VIEW
+213,tcb,information_schema,domains,VIEW
+214,tcb,information_schema,enabled_roles,VIEW
+215,tcb,information_schema,schemata,VIEW
+216,tcb,information_schema,key_column_usage,VIEW
+217,tcb,information_schema,role_routine_grants,VIEW
+218,tcb,information_schema,parameters,VIEW
+219,tcb,information_schema,referential_constraints,VIEW
+220,tcb,information_schema,routine_routine_usage,VIEW
+221,tcb,information_schema,routine_sequence_usage,VIEW
+222,tcb,information_schema,sequences,VIEW
+223,tcb,information_schema,routine_table_usage,VIEW
+224,tcb,information_schema,sql_implementation_info,BASE TABLE
+225,tcb,information_schema,sql_features,BASE TABLE
+226,tcb,information_schema,sql_sizing,BASE TABLE
+227,tcb,information_schema,table_constraints,VIEW
+228,tcb,information_schema,table_privileges,VIEW
+229,tcb,information_schema,view_table_usage,VIEW
+230,tcb,information_schema,role_table_grants,VIEW
+231,tcb,information_schema,tables,VIEW
+232,tcb,information_schema,user_mappings,VIEW
+233,tcb,information_schema,triggered_update_columns,VIEW
+234,tcb,information_schema,views,VIEW
+235,tcb,information_schema,triggers,VIEW
+236,tcb,information_schema,udt_privileges,VIEW
+237,tcb,information_schema,foreign_data_wrappers,VIEW
+238,tcb,information_schema,role_udt_grants,VIEW
+239,tcb,information_schema,data_type_privileges,VIEW
+240,tcb,information_schema,usage_privileges,VIEW
+241,tcb,information_schema,role_usage_grants,VIEW
+242,tcb,information_schema,user_defined_types,VIEW
+243,tcb,information_schema,element_types,VIEW
+244,tcb,information_schema,view_column_usage,VIEW
+245,tcb,information_schema,view_routine_usage,VIEW
+246,tcb,information_schema,column_options,VIEW
+247,tcb,information_schema,foreign_table_options,VIEW
+248,tcb,information_schema,foreign_data_wrapper_options,VIEW
+249,tcb,information_schema,foreign_server_options,VIEW
+250,tcb,information_schema,foreign_servers,VIEW
+251,tcb,information_schema,user_mapping_options,VIEW
+252,tcb,information_schema,foreign_tables,VIEW
+253,tcb,tcb,player_grand_slam_holder_goat_points_v,VIEW
+254,tcb,tcb,player_grand_slam_on_same_event_goat_points_v,VIEW
+255,tcb,tcb,player_greatest_rivalries_goat_points_v,VIEW
+256,tcb,tcb,player_h2h_v,VIEW
+257,tcb,tcb,records_goat_points,BASE TABLE
+258,tcb,tcb,player_match_performance_v,VIEW
+259,tcb,tcb,player_season_performance_v,VIEW
+260,tcb,tcb,player_record_goat_points_v,VIEW
+261,tcb,tcb,player_performance_v,VIEW
+262,tcb,tcb,player_records_goat_points_v,VIEW
+263,tcb,tcb,player_performance_goat_points_v,VIEW
+264,tcb,tcb,player_weeks_at_no1_v,VIEW
+265,tcb,tcb,player_record,BASE TABLE
+266,tcb,tcb,player_surface_stats_v,VIEW
+267,tcb,tcb,player_stats_v,VIEW
+268,tcb,tcb,player_titles_v,VIEW
+269,tcb,tcb,player_statistics_goat_points_v,VIEW
+270,tcb,tcb,player_weeks_at_elo_topn_v,VIEW
+271,tcb,tcb,player_weeks_at_elo_topn_goat_points_v,VIEW
+272,tcb,tcb,player_weeks_at_no1_goat_points_v,VIEW
+273,tcb,tcb,player_goat_points_v,VIEW
+274,tcb,tcb,statistics_goat_points,BASE TABLE
+275,tcb,tcb,set_score,BASE TABLE
+276,tcb,tcb,player_in_progress_match_stats_v,VIEW
+277,tcb,tcb,player_surface_best_rank_goat_points_v,VIEW
+278,tcb,tcb,player_indoor_win_streak_v,VIEW
+279,tcb,tcb,player_level_win_streak_v,VIEW
+280,tcb,tcb,player_surface_season_big_wins_goat_points_v,VIEW
+281,tcb,tcb,player_season_best_elo_rating_v,VIEW
+282,tcb,tcb,player_surface_h2h_goat_points_v,VIEW
+283,tcb,tcb,player_surface_season_goat_points_v,VIEW
+284,tcb,tcb,topn_player_surface_elo_ranking_v,VIEW
+285,tcb,tcb,player_season_weeks_at_surface_elo_topn_v,VIEW
+286,tcb,tcb,player_season_weeks_at_surface_elo_topn_goat_points_v,VIEW
+287,tcb,tcb,player_mapping,BASE TABLE
+288,tcb,tcb,player_surface_best_season_goat_points_v,VIEW
+289,tcb,tcb,player_surface_big_wins_goat_points_v,VIEW
+290,tcb,tcb,surface_records_goat_points,BASE TABLE
+291,tcb,tcb,player_surface_greatest_rivalries_goat_points_v,VIEW
+292,tcb,tcb,team_tournament_event_winner,BASE TABLE
+293,tcb,tcb,player_surface_records_goat_points_v,VIEW
+294,tcb,tcb,player_weeks_at_surface_elo_topn_v,VIEW
+295,tcb,tcb,player_weeks_at_surface_elo_topn_goat_points_v,VIEW
+296,tcb,tcb,player_surface_win_streak_v,VIEW
+297,tcb,tcb,player_surface_goat_points_v,VIEW
+298,tcb,tcb,player_in_progress_result,BASE TABLE
+299,tcb,tcb,player_team_titles_v,VIEW
+300,tcb,tcb,player_tournament_goat_points_v,VIEW
+301,tcb,tcb,statistics_category,BASE TABLE
+302,tcb,tcb,player_tournament_level_win_streak_v,VIEW
+303,tcb,tcb,player_vs_top5_win_streak_v,VIEW
+304,tcb,tcb,player_tournament_performance_v,VIEW
+305,tcb,tcb,player_tournament_win_streak_v,VIEW
+306,tcb,tcb,player_v,VIEW
+307,tcb,tcb,player_vs_no1_win_streak_v,VIEW
+308,tcb,tcb,player_win_streak_v,VIEW
+309,tcb,tcb,player_vs_top10_win_streak_v,VIEW
+310,tcb,tcb,saved_record,BASE TABLE
+311,tcb,tcb,player_year_end_elo_rank_v,VIEW
+312,tcb,tcb,visitor,BASE TABLE
+313,tcb,tcb,title_difficulty_v,VIEW
+314,tcb,tcb,visitor_summary,BASE TABLE
+315,tcb,tcb,tournament,BASE TABLE
+316,tcb,tcb,tournament_mapping,BASE TABLE
+317,tcb,tcb,visitor_summary_v,VIEW
+318,tcb,tcb,visitor_summary_all_v,VIEW
