@@ -10,4 +10,4 @@ pandas
 plotly
 requests
 scikit-learn
-psycopg2-binary
+psycopg2
