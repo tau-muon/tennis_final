@@ -645,8 +645,7 @@ app.layout = html.Div(
                                                 html.Div(
                                                     [html.P(id="comment3", children='Line graphs shows rank of '
                                                                                     'player 1 and player 2 over '
-                                                                                    'seasons, in case of a gap there '
-                                                                                    'maybe some abnormal behaviour.')],
+                                                                                    'seasons')],
                                                     className="box_comment",
                                                 ),
                                             ],
@@ -676,8 +675,7 @@ app.layout = html.Div(
                                                     [html.P(id="comment4", children='Line graphs shows no of '
                                                                                     'titles won by '
                                                                                     'player 1 and player 2 over '
-                                                                                    'seasons, in case of a gap there '
-                                                                                    'maybe some abnormal behaviour.')],
+                                                                                    'seasons.')],
                                                     className="box_comment",
                                                 ),
                                             ],
