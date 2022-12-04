@@ -901,4 +901,4 @@ def update_plot(player1, player2, surface_type, best_of, in_out):
         raise PreventUpdate
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
