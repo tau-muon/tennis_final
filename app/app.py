@@ -1,6 +1,8 @@
 # Import Libraries
 
+import sys
 import dash
+import pickle
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
@@ -10,6 +12,9 @@ import json
 from dash import html, dcc
 from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
+
+sys.path.insert(0, "../analytics")
+from ML import MLModel
 
 # Helper functions
 
@@ -33,6 +38,7 @@ method = 'method=get_players'
 
 
 standings = pd.DataFrame(get_standings(API_KEY))[["player", "place", "points", 'player_key']]
+#model = MLModel()
 # country_code = dict(df["country_id"])
 
 
@@ -306,6 +312,25 @@ def summ_table(df, standings, id_1, id_2):
 
     return fig
 
+def pred_winner(p1_id, p2_id, surface, bestof, indoor):
+    #winnerID = model.predict(p1_id,p2_id,surface,bestof,indoor)
+    winnerID = 4742
+    winnerLn = df.loc[winnerID]['last_name']
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Indicator(
+        mode = "number",
+        value = None,
+        number = {'font_color':'white', 'font_size':10, 'prefix': f"Winner: {winnerLn}"},
+        delta = {'position': "top", 'reference': 320},
+        domain = {'x': [0, 1], 'y': [0.5, 1]}))
+    fig.add_annotation(
+        text=f"Winner: {winnerLn}",
+        showarrow=False,
+        font={'size': 60, 'color': 'black'})
+    return fig
+
 # ------------------------------------------------------ APP ------------------------------------------------------
 
 app = dash.Dash(__name__, prevent_initial_callbacks=False)
@@ -317,7 +342,7 @@ app.layout = html.Div(
     [
         # left pane
         html.Div(
-            [
+            [   
                 html.H1(children="Tennis Prediction"),
                 html.Label(
                     "This app compares various statistics for two selected players and tries to predict the winner if "
@@ -643,52 +668,7 @@ app.layout = html.Div(
                             className="box",
                         ),
 
-                        # Two Indicators age and current ranking. Row 4 of viz
-
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.Div(
-                                            [
-                                                html.Label(id="title_bar5"),
-                                                dcc.Graph(id="age"),
-                                                html.Div(
-                                                    [html.P(id="comment5", children='This indicator shows the age '
-                                                                                   'of each player ')],
-                                                    className="box_comment",
-                                                ),
-                                            ],
-                                            className="box",
-                                            style={"padding-bottom": "15px"},
-                                        ),
-
-                                    ],
-                                    style={"width": "50%", "display": "inline-block"},
-                                ),
-                                html.Div(
-                                    [
-                                        html.Div(
-                                            [
-                                                html.Label(id="title_bar6"),
-                                                dcc.Graph(id="rank"),
-                                                html.Div(
-                                                    [html.P(id="comment6", children="This indicator shows the current "
-                                                                                    "rank of each player  ")],
-                                                    className="box_comment",
-                                                ),
-
-                                            ],
-                                            className="box",
-                                            style={"padding-bottom": "15px"},
-                                        ),
-
-                                    ],
-                                    style={"width": "50%", "display": "inline-block"},
-                                ),
-                            ],
-                            className="box",
-                        ),
+                        #Row 4, table with general info
 
                         html.Div(
                             [
@@ -716,6 +696,34 @@ app.layout = html.Div(
                             className="box",
                         ),
 
+                        #Row 5, Predicted Winner
+
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.Div(
+                                            [
+                                                html.Label(id="title_bar8"),
+                                                dcc.Graph(id="pred_winner"),
+                                                html.Div(
+                                                    [html.P(id="comment8", children='This indicator shows the predicted winner '
+                                                                                    'using our ML model')],
+                                                    className="box_comment",
+                                                ),
+                                            ],
+                                            className="box",
+                                            style={"padding-bottom": "15px"},
+                                        ),
+
+                                    ],
+                                    style={"width": "100%", "display": "inline-block"},
+                                ),
+
+                            ],
+                            className="box",
+                        ),
+
 
                         
 
@@ -727,7 +735,7 @@ app.layout = html.Div(
                                             [
                                                 "Team 180",
                                                 html.Br(),
-                                                "Sheikh Jalaluddin, Michael Riveira, Abanoub Abdelmalek, Mohammed Adel",
+                                                "Sheikh Jalaluddin, Michael Rivera, Abanoub Abdelmalek, Mohammed Adel",
                                             ],
                                             style={"font-size": "12px"},
                                         ),
@@ -872,36 +880,28 @@ def update_plot(player1, player2):
         raise PreventUpdate
 
 @app.callback(
-    Output(component_id='age', component_property='figure'),
-    [Input(component_id='dropdown_player_1', component_property='value'),
-     Input(component_id='dropdown_player_2', component_property='value')])
-def update_plot(player1, player2):
-    if player1 != player2:
-        fig = age(df, player1, player2)
-        fig.update_layout(template='gridon')
-        return fig
-    else:
-        raise PreventUpdate
-
-@app.callback(
-    Output(component_id='rank', component_property='figure'),
-    [Input(component_id='dropdown_player_1', component_property='value'),
-     Input(component_id='dropdown_player_2', component_property='value')])
-def update_plot(player1, player2):
-    if player1 != player2:
-        fig = rank(df, standings, player1, player2)
-        fig.update_layout(template='gridon')
-        return fig
-    else:
-        raise PreventUpdate
-
-@app.callback(
     Output(component_id='summ_table', component_property='figure'),
     [Input(component_id='dropdown_player_1', component_property='value'),
      Input(component_id='dropdown_player_2', component_property='value')])
 def update_plot(player1, player2):
     if player1 != player2:
         fig = summ_table(df, standings, player1, player2)
+        fig.update_layout(template='gridon')
+        return fig
+    else:
+        raise PreventUpdate
+
+@app.callback(
+    Output(component_id='pred_winner', component_property='figure'),
+    [Input(component_id='dropdown_player_1', component_property='value'),
+     Input(component_id='dropdown_player_2', component_property='value'),
+     Input(component_id='surface_type', component_property='value'),
+     Input(component_id='best_of', component_property='value'),
+     Input(component_id='in_out', component_property='value')
+     ])
+def update_plot(player1, player2, surface, best_of, in_out):
+    if player1 != player2:
+        fig = pred_winner(player1, player2, surface, best_of, in_out)
         fig.update_layout(template='gridon')
         return fig
     else:
