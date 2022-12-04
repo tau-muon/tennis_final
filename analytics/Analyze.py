@@ -54,20 +54,6 @@ class Analysis(object):
         return df
 
 
-    def clean_minimum_match_count(self, match_count:int=10):
-        """ Clean the players that only played match_count
-
-        Args:
-            match_count (int, optional): _description_. Defaults to 10.
-        """
-        return
-
-
-    def clean_2020_matchs(self, df:pd.DataFrame):
-        # print(df["date"])
-        return df
-
-
     def clean(self) -> pd.DataFrame:
         """ Perform all the cleaning needed to create the data directly
 
@@ -75,8 +61,6 @@ class Analysis(object):
             pd.DataFrame: Dataframe with all the data needed
         """
         df = self.clean_nanstats_match()
-        df = self.clean_2020_matchs(df)
-
         df = df[df["surface"] != "P"]
         return df
 
@@ -94,19 +78,7 @@ class Analysis(object):
         playerData = self.getPlayerData()
         merged_df = pd.merge(self.match_df, playerData, left_on="winner_id", right_on="player_id")
         merged_df = pd.merge(merged_df, playerData, left_on="loser_id", right_on="player_id", suffixes=("_winner", "_loser"))
-        # merged_df.to_csv("full_data.csv", index=False)
-        
-        # # Loop on all the players to 
-        # player_id_list = merged_df["winner_id"].tolist()
-        # player_id_list.extend(merged_df["loser_id"].tolist())
-        # player_id_list = list(set(player_id_list))
-        # merged_df["result"] = -1
-        # for player_id in player_id_list:
-        #     player_matchs_df = merged_df[(merged_df["winner_id"] == player_id) | (merged_df["loser_id"] == player_id)].sample(frac=1, random_state=SEED).reset_index(drop=True)
-        #     rowcutoff = int(player_matchs_df.shape[0]/2)
-        #     merged_df.loc[merged_df.index.isin(player_matchs_df.index[:rowcutoff]) & merged_df["result"] == -1, "result"] = 1
-        #     merged_df.loc[merged_df.index.isin(player_matchs_df.index[rowcutoff:]) & merged_df["result"] == -1, "result"] = 2
-
+  
         rowcutoff = int(merged_df.shape[0]/2)
         p1_data = merged_df[:rowcutoff]
         p2_data = merged_df[rowcutoff:]

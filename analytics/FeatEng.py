@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath("../"))
 
 from analytics.Database import Database
 
-READ_LOCALLY = False
+READ_LOCALLY = True
 DB_PATH = "./db/"
 
 class FeaturesEngineering(object):
