@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath("../"))
 from analytics.Database import Database
 
 READ_LOCALLY = True
-DB_PATH = "./db/"
+DB_PATH = "../analytics/db/"
 
 class FeaturesEngineering(object):
     def __init__(self,mode="eval") -> None:
