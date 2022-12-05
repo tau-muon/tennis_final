@@ -115,3 +115,7 @@ if __name__ == "__main__":
     best_of = 3
     WinnerID = model.predict(p1_id,p2_id,surface,bestof,indoor)
     print("Winner is Player With ID: {}".format(WinnerID))
+    subprocess.call(["git", "commit", "-a", "-m", "adding pickle file"])
+    
+    
+    
