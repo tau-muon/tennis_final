@@ -9,4 +9,5 @@ numpy
 pandas
 plotly
 requests
-pickle
+scikit-learn
+psycopg2
