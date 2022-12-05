@@ -11,4 +11,5 @@ numpy
 pandas
 plotly
 requests
+pickle-mixin
 
