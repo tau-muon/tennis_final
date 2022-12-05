@@ -5,9 +5,10 @@ dash-html-components
 dash_renderer
 dash-daq
 dash-bootstrap-components
+scikit-learn
+psycopg2
 numpy
 pandas
 plotly
 requests
-scikit-learn
-psycopg2
+pickle-mixin
