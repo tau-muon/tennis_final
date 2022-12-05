@@ -43,6 +43,7 @@ class MLModel(object):
         model.fit(X,Y)
         pickle.dump(model, open(DB_PATH+'model.pkl', 'wb'))
         subprocess.call(["git", "commit", "-a", "-m", "adding pickle file"])
+        subprocess.call(["git", "push"])
         return model
 
     def predict(self,ID1,ID2,Surface,bestOf,indoor):
